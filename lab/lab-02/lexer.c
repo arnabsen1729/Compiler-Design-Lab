@@ -171,6 +171,8 @@ int yylex() {
                     state = 42;  //! token for "char"
                 } else if (c == 'e') {
                     state = 48;  //! token for "else"
+                } else if (c == 'w') {
+                    state = 53;  //! token for "while"
                 } else if (c == '_' || isalpha(c)) {
                     state = 33;  //! token for identifier
                 } else {
@@ -634,6 +636,66 @@ int yylex() {
                 logger("IF_TOK");
                 state_reset();
                 return IF_TOK;
+            case 53:  //! state "w"
+                c = nextchar();
+                if (c == 0) return EOF_TOK;
+                if (c == 'h') {
+                    state = 54;  //! reached "wh"
+                } else if (isalpha(c) || c == '_') {
+                    state = 33;  //! token for identifier
+                } else {
+                    set_lookahead(c);
+                    logger("ID_TOK");
+                    state_reset();
+                    return ID_TOK;
+                }
+                break;
+            case 54:  //! state "wh"
+                c = nextchar();
+                if (c == 0) return EOF_TOK;
+                if (c == 'i') {
+                    state = 55;  //! reached "whi"
+                } else if (isalpha(c) || c == '_') {
+                    state = 33;  //! token for identifier
+                } else {
+                    set_lookahead(c);
+                    logger("ID_TOK");
+                    state_reset();
+                    return ID_TOK;
+                }
+                break;
+            case 55:  //! state "whi"
+                c = nextchar();
+                if (c == 0) return EOF_TOK;
+                if (c == 'l') {
+                    state = 56;  //! reached "whil"
+                } else if (isalpha(c) || c == '_') {
+                    state = 33;  //! token for identifier
+                } else {
+                    set_lookahead(c);
+                    logger("ID_TOK");
+                    state_reset();
+                    return ID_TOK;
+                }
+                break;
+            case 56:  //! state "whil"
+                c = nextchar();
+                if (c == 0) return EOF_TOK;
+                if (c == 'e') {
+                    state = 57;  //! reached "while"
+                } else if (isalpha(c) || c == '_') {
+                    state = 33;  //! token for identifier
+                } else {
+                    set_lookahead(c);
+                    logger("ID_TOK");
+                    state_reset();
+                    return ID_TOK;
+                }
+                break;
+            case 57:  //! token for "while"
+                logger("WHILE_TOK");
+                state_reset();
+                return WHILE_TOK;
             default:
                 fail();
                 return -1;
