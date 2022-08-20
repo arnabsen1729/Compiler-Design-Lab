@@ -165,6 +165,8 @@ int yylex() {
                     state = 31;  //! token for ";"
                 } else if (c == 'i') {
                     state = 34;  //! token for "int"
+                } else if (c == 'f') {
+                    state = 37;  //! token for "float"
                 } else if (c == '_' || isalpha(c)) {
                     state = 33;  //! token for identifier
                 } else {
@@ -406,7 +408,7 @@ int yylex() {
                 logger("RBRACKET_TOK");
                 state_reset();
                 return RBRACKET_TOK;
-            case 33:
+            case 33:  //! token for identifier
                 c = nextchar();
                 if (c == 0) return EOF_TOK;
                 if (isalpha(c) || c == '_') {
@@ -418,7 +420,7 @@ int yylex() {
                     return ID_TOK;
                 }
                 break;
-            case 34:
+            case 34: //! state "i"
                 c = nextchar();
                 if (c == 0) return EOF_TOK;
                 if (c == 'n') {
@@ -447,10 +449,69 @@ int yylex() {
                 }
                 break;
             case 36:  //! token for "int"
-                c = nextchar();
                 logger("INT_TOK");
                 state_reset();
                 return INT_TOK;
+            case 37: //! state "f"
+                c = nextchar();
+                if (c == 0) return EOF_TOK;
+                if (c == 'l') {
+                    state = 38;  //! reached "fl"
+                } else if (isalpha(c) || c == '_') {
+                    state = 33;  //! token for identifier
+                } else {
+                    set_lookahead(c);
+                    logger("ID_TOK");
+                    state_reset();
+                    return ID_TOK;
+                }
+                break;
+            case 38:  //! state "fl"
+                c = nextchar();
+                if (c == 0) return EOF_TOK;
+                if (c == 'o') {
+                    state = 39;  //! reached "flo"
+                } else if (isalpha(c) || c == '_') {
+                    state = 33;  //! token for identifier
+                } else {
+                    set_lookahead(c);
+                    logger("ID_TOK");
+                    state_reset();
+                    return ID_TOK;
+                }
+                break;
+            case 39: //! state "flo"
+                c = nextchar();
+                if (c == 0) return EOF_TOK;
+                if (c == 'a') {
+                    state = 40;  //! reached "floa"
+                } else if (isalpha(c) || c == '_') {
+                    state = 33;  //! token for identifier
+                } else {
+                    set_lookahead(c);
+                    logger("ID_TOK");
+                    state_reset();
+                    return ID_TOK;
+                }
+                break;
+            case 40: //! state "floa"
+                c = nextchar();
+                if (c == 0) return EOF_TOK;
+                if (c == 't') {
+                    state = 41;  //! reached "float"
+                } else if (isalpha(c) || c == '_') {
+                    state = 33;  //! token for identifier
+                } else {
+                    set_lookahead(c);
+                    logger("ID_TOK");
+                    state_reset();
+                    return ID_TOK;
+                }
+                break;
+            case 41: //! token for "float"
+                logger("FLOAT_TOK");
+                state_reset();
+                return FLOAT_TOK;
             default:
                 fail();
                 return -1;
