@@ -459,6 +459,8 @@ int yylex() {
                 if (c == 0) return EOF_TOK;
                 if (c == 'l') {
                     state = 38;  //! reached "fl"
+                } else if(c == 'o'){
+                    state = 46; //! reached "fo"
                 } else if (isalpha(c) || c == '_') {
                     state = 33;  //! token for identifier
                 } else {
@@ -560,6 +562,24 @@ int yylex() {
                 logger("CHAR_TOK");
                 state_reset();
                 return CHAR_TOK;
+            case 46: //! state "fo"
+                c = nextchar();
+                if (c == 0) return EOF_TOK;
+                if (c == 'r') {
+                    state = 47;  //! reached "for"
+                } else if (isalpha(c) || c == '_') {
+                    state = 33;  //! token for identifier
+                } else {
+                    set_lookahead(c);
+                    logger("ID_TOK");
+                    state_reset();
+                    return ID_TOK;
+                }
+                break;
+            case 47: //! token for "for" 
+                logger("FOR_TOK");
+                state_reset();
+                return FOR_TOK;
             default:
                 fail();
                 return -1;
