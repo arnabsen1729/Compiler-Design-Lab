@@ -128,6 +128,16 @@ int yylex() {
                     state = 3;  //! token for "="
                 } else if (c == '>') {
                     state = 4;  //! token for ">"
+                } else if (c == '+') {
+                    state = 6;  //! token for "+"
+                } else if (c == '-') {
+                    state = 7;  //! token for "-"
+                } else if (c == '/') {
+                    state = 8;  //! token for "/"
+                } else if (c == '*') {
+                    state = 9;  //! token for "*"
+                } else if (c == '%') {
+                    state = 10;  //! token for "%"
                 } else
                     fail();
                 break;
@@ -178,6 +188,86 @@ int yylex() {
                 logger("GT_EQ_TOK");
                 state_reset();
                 return GT_EQ_TOK;
+            case 6:  //! token for "+"
+                c = nextchar();
+                if (c == 0) return EOF_TOK;
+
+                if (c == '=') {
+                    state = 11;  //! token for "+="
+                } else {
+                    logger("PLUS_TOK");
+                    state_reset();
+                    return PLUS_TOK;
+                }
+                break;
+            case 7:  //! token for "-"
+                c = nextchar();
+                if (c == 0) return EOF_TOK;
+
+                if (c == '=') {
+                    state = 12;  //! token for "-="
+                } else {
+                    logger("MINUS_TOK");
+                    state_reset();
+                    return MINUS_TOK;
+                }
+                break;
+            case 8:  //! token for "/"
+                c = nextchar();
+                if (c == 0) return EOF_TOK;
+
+                if (c == '=') {
+                    state = 13;  //! token for "/="
+                } else {
+                    logger("DIV_TOK");
+                    state_reset();
+                    return DIV_TOK;
+                }
+                break;
+            case 9:  //! token for "*"
+                c = nextchar();
+                if (c == 0) return EOF_TOK;
+
+                if (c == '=') {
+                    state = 14;  //! token for "*="
+                } else {
+                    logger("MULT_TOK");
+                    state_reset();
+                    return MULT_TOK;
+                }
+                break;
+            case 10:  //! token for "%"
+                c = nextchar();
+                if (c == 0) return EOF_TOK;
+
+                if (c == '=') {
+                    state = 15;  //! token for "%="
+                } else {
+                    logger("MOD_TOK");
+                    state_reset();
+                    return MOD_TOK;
+                }
+                break;
+            case 11:  //! token for "+="
+                logger("PLUS_EQ_TOK");
+                state_reset();
+                return PLUS_EQ_TOK;
+            case 12:  //! token for "-="
+                logger("MINUS_EQ_TOK");
+                state_reset();
+                return MINUS_EQ_TOK;
+            case 13:  //! token for "/="
+                logger("DIV_EQ_TOK");
+                state_reset();
+                return DIV_EQ_TOK;
+            case 14:  //! token for "*="
+                logger("MULT_EQ_TOK");
+                state_reset();
+                return MULT_EQ_TOK;
+            case 15:  //! token for "%="
+                logger("MOD_EQ_TOK");
+                state_reset();
+                return MOD_EQ_TOK;
             case 16:  //! token for "=="
                 logger("EQ_EQ_TOK");
                 state_reset();
