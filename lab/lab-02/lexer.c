@@ -1,5 +1,7 @@
 #include <ctype.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define EOF_TOK 0
 #define BLANK ' '
@@ -71,13 +73,20 @@
 #define INTCONST 351
 #define FLOATCONST 352
 
-FILE *file;           // source file pointer
+FILE *yyin;        // input source file ptr
+int yylineno = 0;  // line number
+char *yytext;      // lexeme
+char c = '\0';
+
 char lookahead = -1;  // lookahead character
-int state;
-int yylineno;
+int state = 0;        // current transition state id
+char *token_name;
 
 /**
- * @brief Returns the next non-whitespace character from the file.
+ * @brief Returns the next non-whitespace character from the yyin.
+ *
+ * If there already exists a character in the lookahead buffer, it then
+ * returns the character, else reads a new character from the yyin.
  *
  * @return char
  */
@@ -88,15 +97,26 @@ char nextchar() {
         return c;
     }
 
-    char c = fgetc(file);
+    char c = fgetc(yyin);
 
-    if (feof(file)) {
+    if (feof(yyin)) {
         return '\0';
     }
 
     return c;
 }
 
+void append_to_yytext() {
+    char temp[] = "0";
+    temp[0] = c;
+    strcat(yytext, temp);
+}
+
+/**
+ * @brief Set the lookahead value
+ *
+ * @param c Character to be set as lookahead
+ */
 void set_lookahead(char c) {
     lookahead = c;
 }
@@ -105,8 +125,8 @@ void fail() {
     printf("Lexical error at line %d\n", yylineno);
 }
 
-void logger(char *msg) {
-    printf("[%s]\n", msg);
+void set_token_name(char *msg) {
+    token_name = msg;
 }
 
 void state_reset() {
@@ -114,14 +134,21 @@ void state_reset() {
 }
 
 int yylex() {
+    yytext = malloc(256);
+    c = '\0';
     while (1) {
-        char c;
+        if (c != '\0') append_to_yytext();
         switch (state) {
             case 0:  // initial state
                 c = nextchar();
                 if (c == 0) return EOF_TOK;
 
-                if (c == BLANK || c == TAB || c == NEWLINE) {
+                if (c == BLANK || c == TAB) {
+                    c = '\0';
+                    state_reset();
+                } else if (c == NEWLINE) {
+                    c = '\0';
+                    yylineno++;
                     state_reset();
                 } else if (c == '<') {
                     state = 1;  //! token for "<"
@@ -188,13 +215,13 @@ int yylex() {
                     state = 2;  //! token for "<="
                 } else {
                     set_lookahead(c);
-                    logger("LT_TOK");
+                    set_token_name("LT_TOK");
                     state_reset();
                     return LT_TOK;
                 }
                 break;
             case 2:  //! token for "<="
-                logger("LT_EQ_TOK");
+                set_token_name("LT_EQ_TOK");
                 state_reset();
                 return LT_EQ_TOK;
             case 3:  //! token for "="
@@ -205,7 +232,7 @@ int yylex() {
                     state = 16;  //! token for "=="
                 } else {
                     set_lookahead(c);
-                    logger("EQ_TOK");
+                    set_token_name("EQ_TOK");
                     state_reset();
                     return EQ_TOK;
                 }
@@ -218,13 +245,13 @@ int yylex() {
                     state = 5;  //! token for ">="
                 } else {
                     set_lookahead(c);
-                    logger("GT_TOK");
+                    set_token_name("GT_TOK");
                     state_reset();
                     return GT_TOK;
                 }
                 break;
             case 5:  //! token for ">="
-                logger("GT_EQ_TOK");
+                set_token_name("GT_EQ_TOK");
                 state_reset();
                 return GT_EQ_TOK;
             case 6:  //! token for "+"
@@ -234,7 +261,7 @@ int yylex() {
                 if (c == '=') {
                     state = 11;  //! token for "+="
                 } else {
-                    logger("PLUS_TOK");
+                    set_token_name("PLUS_TOK");
                     state_reset();
                     return PLUS_TOK;
                 }
@@ -246,7 +273,7 @@ int yylex() {
                 if (c == '=') {
                     state = 12;  //! token for "-="
                 } else {
-                    logger("MINUS_TOK");
+                    set_token_name("MINUS_TOK");
                     state_reset();
                     return MINUS_TOK;
                 }
@@ -258,7 +285,7 @@ int yylex() {
                 if (c == '=') {
                     state = 13;  //! token for "/="
                 } else {
-                    logger("DIV_TOK");
+                    set_token_name("DIV_TOK");
                     state_reset();
                     return DIV_TOK;
                 }
@@ -270,7 +297,7 @@ int yylex() {
                 if (c == '=') {
                     state = 14;  //! token for "*="
                 } else {
-                    logger("MULT_TOK");
+                    set_token_name("MULT_TOK");
                     state_reset();
                     return MULT_TOK;
                 }
@@ -282,33 +309,33 @@ int yylex() {
                 if (c == '=') {
                     state = 15;  //! token for "%="
                 } else {
-                    logger("MOD_TOK");
+                    set_token_name("MOD_TOK");
                     state_reset();
                     return MOD_TOK;
                 }
                 break;
             case 11:  //! token for "+="
-                logger("PLUS_EQ_TOK");
+                set_token_name("PLUS_EQ_TOK");
                 state_reset();
                 return PLUS_EQ_TOK;
             case 12:  //! token for "-="
-                logger("MINUS_EQ_TOK");
+                set_token_name("MINUS_EQ_TOK");
                 state_reset();
                 return MINUS_EQ_TOK;
             case 13:  //! token for "/="
-                logger("DIV_EQ_TOK");
+                set_token_name("DIV_EQ_TOK");
                 state_reset();
                 return DIV_EQ_TOK;
             case 14:  //! token for "*="
-                logger("MULT_EQ_TOK");
+                set_token_name("MULT_EQ_TOK");
                 state_reset();
                 return MULT_EQ_TOK;
             case 15:  //! token for "%="
-                logger("MOD_EQ_TOK");
+                set_token_name("MOD_EQ_TOK");
                 state_reset();
                 return MOD_EQ_TOK;
             case 16:  //! token for "=="
-                logger("EQ_EQ_TOK");
+                set_token_name("EQ_EQ_TOK");
                 state_reset();
                 return EQ_EQ_TOK;
             case 17:  //! token for "&"
@@ -318,13 +345,13 @@ int yylex() {
                     state = 18;  //! token for "&&"
                 } else {
                     set_lookahead(c);
-                    logger("AND_TOK");
+                    set_token_name("AND_TOK");
                     state_reset();
                     return AND_TOK;
                 }
                 break;
             case 18:  //! token for "&&"
-                logger("LOG_AND_TOK");
+                set_token_name("LOG_AND_TOK");
                 state_reset();
                 return LOG_AND_TOK;
             case 19:  //! token for "|"
@@ -334,21 +361,21 @@ int yylex() {
                     state = 20;  //! token for "||"
                 } else {
                     set_lookahead(c);
-                    logger("OR_TOK");
+                    set_token_name("OR_TOK");
                     state_reset();
                     return OR_TOK;
                 }
                 break;
             case 20:  //! token for "||"
-                logger("LOG_OR_TOK");
+                set_token_name("LOG_OR_TOK");
                 state_reset();
                 return LOG_OR_TOK;
             case 21:  //! token for "!"
-                logger("NOT_TOK");
+                set_token_name("NOT_TOK");
                 state_reset();
                 return NOT_TOK;
             case 22:  //! token for "^"
-                logger("XOR_TOK");
+                set_token_name("XOR_TOK");
                 state_reset();
                 return XOR_TOK;
             case 23:
@@ -360,7 +387,7 @@ int yylex() {
                     state = 24;  //! token for float constant
                 } else {
                     set_lookahead(c);
-                    logger("INTCONST");
+                    set_token_name("INTCONST");
                     state_reset();
                     return INTCONST;
                 }
@@ -381,37 +408,37 @@ int yylex() {
                     state = 25;  //! token for float constant
                 } else {
                     set_lookahead(c);
-                    logger("FLOATCONST");
+                    set_token_name("FLOATCONST");
                     state_reset();
                     return FLOATCONST;
                 }
                 break;
             case 26:  //! token for "("
-                logger("LPAREN_TOK");
+                set_token_name("LPAREN_TOK");
                 state_reset();
                 return LPAREN_TOK;
             case 27:  //! token for ")"
-                logger("RPAREN_TOK");
+                set_token_name("RPAREN_TOK");
                 state_reset();
                 return RPAREN_TOK;
             case 28:  //! token or "["
-                logger("LBRACKET_TOK");
+                set_token_name("LBRACKET_TOK");
                 state_reset();
                 return LBRACKET_TOK;
             case 29:  //! token for "{"
-                logger("LBRACE_TOK");
+                set_token_name("LBRACE_TOK");
                 state_reset();
                 return LBRACE_TOK;
             case 30:  //! token for "}"
-                logger("RBRACE_TOK");
+                set_token_name("RBRACE_TOK");
                 state_reset();
                 return RBRACE_TOK;
             case 31:  //! token for "!"
-                logger("SEMICOLON_TOK");
+                set_token_name("SEMICOLON_TOK");
                 state_reset();
                 return SEMICOLON_TOK;
             case 32:  //! token for "]"
-                logger("RBRACKET_TOK");
+                set_token_name("RBRACKET_TOK");
                 state_reset();
                 return RBRACKET_TOK;
             case 33:  //! token for identifier
@@ -421,7 +448,7 @@ int yylex() {
                     state = 33;  //! token for identifier
                 } else {
                     set_lookahead(c);
-                    logger("ID_TOK");
+                    set_token_name("ID_TOK");
                     state_reset();
                     return ID_TOK;
                 }
@@ -437,7 +464,7 @@ int yylex() {
                     state = 33;  //! token for identifier
                 } else {
                     set_lookahead(c);
-                    logger("ID_TOK");
+                    set_token_name("ID_TOK");
                     state_reset();
                     return ID_TOK;
                 }
@@ -451,13 +478,13 @@ int yylex() {
                     state = 33;  //! token for identifier
                 } else {
                     set_lookahead(c);
-                    logger("ID_TOK");
+                    set_token_name("ID_TOK");
                     state_reset();
                     return ID_TOK;
                 }
                 break;
             case 36:  //! token for "int"
-                logger("INT_TOK");
+                set_token_name("INT_TOK");
                 state_reset();
                 return INT_TOK;
             case 37:  //! state "f"
@@ -471,7 +498,7 @@ int yylex() {
                     state = 33;  //! token for identifier
                 } else {
                     set_lookahead(c);
-                    logger("ID_TOK");
+                    set_token_name("ID_TOK");
                     state_reset();
                     return ID_TOK;
                 }
@@ -485,7 +512,7 @@ int yylex() {
                     state = 33;  //! token for identifier
                 } else {
                     set_lookahead(c);
-                    logger("ID_TOK");
+                    set_token_name("ID_TOK");
                     state_reset();
                     return ID_TOK;
                 }
@@ -499,7 +526,7 @@ int yylex() {
                     state = 33;  //! token for identifier
                 } else {
                     set_lookahead(c);
-                    logger("ID_TOK");
+                    set_token_name("ID_TOK");
                     state_reset();
                     return ID_TOK;
                 }
@@ -513,13 +540,13 @@ int yylex() {
                     state = 33;  //! token for identifier
                 } else {
                     set_lookahead(c);
-                    logger("ID_TOK");
+                    set_token_name("ID_TOK");
                     state_reset();
                     return ID_TOK;
                 }
                 break;
             case 41:  //! token for "float"
-                logger("FLOAT_TOK");
+                set_token_name("FLOAT_TOK");
                 state_reset();
                 return FLOAT_TOK;
             case 42:  //! state "c"
@@ -531,7 +558,7 @@ int yylex() {
                     state = 33;  //! token for identifier
                 } else {
                     set_lookahead(c);
-                    logger("ID_TOK");
+                    set_token_name("ID_TOK");
                     state_reset();
                     return ID_TOK;
                 }
@@ -545,7 +572,7 @@ int yylex() {
                     state = 33;  //! token for identifier
                 } else {
                     set_lookahead(c);
-                    logger("ID_TOK");
+                    set_token_name("ID_TOK");
                     state_reset();
                     return ID_TOK;
                 }
@@ -559,13 +586,13 @@ int yylex() {
                     state = 33;  //! token for identifier
                 } else {
                     set_lookahead(c);
-                    logger("ID_TOK");
+                    set_token_name("ID_TOK");
                     state_reset();
                     return ID_TOK;
                 }
                 break;
             case 45:  //! token for "char"
-                logger("CHAR_TOK");
+                set_token_name("CHAR_TOK");
                 state_reset();
                 return CHAR_TOK;
             case 46:  //! state "fo"
@@ -577,13 +604,13 @@ int yylex() {
                     state = 33;  //! token for identifier
                 } else {
                     set_lookahead(c);
-                    logger("ID_TOK");
+                    set_token_name("ID_TOK");
                     state_reset();
                     return ID_TOK;
                 }
                 break;
             case 47:  //! token for "for"
-                logger("FOR_TOK");
+                set_token_name("FOR_TOK");
                 state_reset();
                 return FOR_TOK;
             case 48:  //! state "e"
@@ -595,7 +622,7 @@ int yylex() {
                     state = 33;  //! token for identifier
                 } else {
                     set_lookahead(c);
-                    logger("ID_TOK");
+                    set_token_name("ID_TOK");
                     state_reset();
                     return ID_TOK;
                 }
@@ -609,7 +636,7 @@ int yylex() {
                     state = 33;  //! token for identifier
                 } else {
                     set_lookahead(c);
-                    logger("ID_TOK");
+                    set_token_name("ID_TOK");
                     state_reset();
                     return ID_TOK;
                 }
@@ -623,17 +650,17 @@ int yylex() {
                     state = 33;  //! token for identifier
                 } else {
                     set_lookahead(c);
-                    logger("ID_TOK");
+                    set_token_name("ID_TOK");
                     state_reset();
                     return ID_TOK;
                 }
                 break;
             case 51:  //! token for "else"
-                logger("ELSE_TOK");
+                set_token_name("ELSE_TOK");
                 state_reset();
                 return ELSE_TOK;
             case 52:  //! token for "if"
-                logger("IF_TOK");
+                set_token_name("IF_TOK");
                 state_reset();
                 return IF_TOK;
             case 53:  //! state "w"
@@ -645,7 +672,7 @@ int yylex() {
                     state = 33;  //! token for identifier
                 } else {
                     set_lookahead(c);
-                    logger("ID_TOK");
+                    set_token_name("ID_TOK");
                     state_reset();
                     return ID_TOK;
                 }
@@ -659,7 +686,7 @@ int yylex() {
                     state = 33;  //! token for identifier
                 } else {
                     set_lookahead(c);
-                    logger("ID_TOK");
+                    set_token_name("ID_TOK");
                     state_reset();
                     return ID_TOK;
                 }
@@ -673,7 +700,7 @@ int yylex() {
                     state = 33;  //! token for identifier
                 } else {
                     set_lookahead(c);
-                    logger("ID_TOK");
+                    set_token_name("ID_TOK");
                     state_reset();
                     return ID_TOK;
                 }
@@ -687,13 +714,13 @@ int yylex() {
                     state = 33;  //! token for identifier
                 } else {
                     set_lookahead(c);
-                    logger("ID_TOK");
+                    set_token_name("ID_TOK");
                     state_reset();
                     return ID_TOK;
                 }
                 break;
             case 57:  //! token for "while"
-                logger("WHILE_TOK");
+                set_token_name("WHILE_TOK");
                 state_reset();
                 return WHILE_TOK;
             default:
@@ -709,16 +736,21 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    file = fopen(argv[1], "r");
-    if (file == NULL) {
+    yyin = fopen(argv[1], "r");
+    if (yyin == NULL) {
         printf("Error: could not open file %s\n", argv[1]);
         return 1;
     }
-
+    printf("%-10s %-20s %-10s %-10s\n",
+           "Line #",
+           "Token Name",
+           "Token ID", "Value");
+    printf("=================================================\n");
     int token;
-    while (!feof(file)) {
+    while (!feof(yyin)) {
         token = yylex();
-        printf("%d\n", token);
+        if (token == 0) break;
+        printf("%-10d %-20s %-10d %s \n", yylineno, token_name, token, yytext);
     }
 
     return 0;
