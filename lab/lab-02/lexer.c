@@ -167,6 +167,8 @@ int yylex() {
                     state = 34;  //! token for "int"
                 } else if (c == 'f') {
                     state = 37;  //! token for "float"
+                } else if (c == 'c') {
+                    state = 42;  //! token for "char"
                 } else if (c == '_' || isalpha(c)) {
                     state = 33;  //! token for identifier
                 } else {
@@ -512,6 +514,52 @@ int yylex() {
                 logger("FLOAT_TOK");
                 state_reset();
                 return FLOAT_TOK;
+            case 42: //! state "c"
+                c = nextchar();
+                if (c == 0) return EOF_TOK;
+                if (c == 'h') {
+                    state = 43;  //! reached "ch"
+                } else if (isalpha(c) || c == '_') {
+                    state = 33;  //! token for identifier
+                } else {
+                    set_lookahead(c);
+                    logger("ID_TOK");
+                    state_reset();
+                    return ID_TOK;
+                }
+                break;
+            case 43: //! state "ch"
+                c = nextchar();
+                if (c == 0) return EOF_TOK;
+                if (c == 'a') {
+                    state = 44;  //! reached "cha"
+                } else if (isalpha(c) || c == '_') {
+                    state = 33;  //! token for identifier
+                } else {
+                    set_lookahead(c);
+                    logger("ID_TOK");
+                    state_reset();
+                    return ID_TOK;
+                }
+                break;
+            case 44: //! state "cha"
+                c = nextchar();
+                if (c == 0) return EOF_TOK;
+                if (c == 'r') {
+                    state = 45;  //! reached "char"
+                } else if (isalpha(c) || c == '_') {
+                    state = 33;  //! token for identifier
+                } else {
+                    set_lookahead(c);
+                    logger("ID_TOK");
+                    state_reset();
+                    return ID_TOK;
+                }
+                break;
+            case 45: //! token for "char"
+                logger("CHAR_TOK");
+                state_reset();
+                return CHAR_TOK;
             default:
                 fail();
                 return -1;
