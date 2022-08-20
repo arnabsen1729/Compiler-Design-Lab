@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <stdio.h>
 
 #define EOF_TOK 0
@@ -138,7 +139,19 @@ int yylex() {
                     state = 9;  //! token for "*"
                 } else if (c == '%') {
                     state = 10;  //! token for "%"
-                } else
+                } else if (c == '&') {
+                    state = 17;  //! token for "&"
+                } else if (c == '|') {
+                    state = 19;  //! token for "|"
+                } else if (c == '!') {
+                    state = 21;  //! token for "!"
+                } else if (c == '^') {
+                    state = 22;  //! token for "^"
+                } else if (isdigit(c)) {
+                    state = 23;  //! token for integer constant
+                }
+
+                else
                     fail();
                 break;
             case 1:  //! token for "<"
@@ -272,6 +285,81 @@ int yylex() {
                 logger("EQ_EQ_TOK");
                 state_reset();
                 return EQ_EQ_TOK;
+            case 17:  //! token for "&"
+                c = nextchar();
+                if (c == 0) return EOF_TOK;
+                if (c == '&') {
+                    state = 18;  //! token for "&&"
+                } else {
+                    set_lookahead(c);
+                    logger("AND_TOK");
+                    state_reset();
+                    return AND_TOK;
+                }
+                break;
+            case 18:  //! token for "&&"
+                logger("LOG_AND_TOK");
+                state_reset();
+                return LOG_AND_TOK;
+            case 19:  //! token for "|"
+                c = nextchar();
+                if (c == 0) return EOF_TOK;
+                if (c == '|') {
+                    state = 20;  //! token for "||"
+                } else {
+                    set_lookahead(c);
+                    logger("OR_TOK");
+                    state_reset();
+                    return OR_TOK;
+                }
+                break;
+            case 20:  //! token for "||"
+                logger("LOG_OR_TOK");
+                state_reset();
+                return LOG_OR_TOK;
+            case 21:  //! token for "!"
+                logger("NOT_TOK");
+                state_reset();
+                return NOT_TOK;
+            case 22:  //! token for "^"
+                logger("XOR_TOK");
+                state_reset();
+                return XOR_TOK;
+            case 23:
+                c = nextchar();
+                if (c == 0) return EOF_TOK;
+                if (isdigit(c)) {
+                    state = 23;  //! token for integer constant
+                } else if (c == '.') {
+                    state = 24;  //! token for float constant
+                } else {
+                    set_lookahead(c);
+                    logger("INTCONST");
+                    state_reset();
+                    return INTCONST;
+                }
+                break;
+            case 24:
+                c = nextchar();
+                if (c == 0) return EOF_TOK;
+                if (isdigit(c)) {
+                    state = 25;  //! token for float constant
+                } else {
+                    fail();
+                }
+                break;
+            case 25:
+                c = nextchar();
+                if (c == 0) return EOF_TOK;
+                if (isdigit(c)) {
+                    state = 25;  //! token for float constant
+                } else {
+                    set_lookahead(c);
+                    logger("FLOATCONST");
+                    state_reset();
+                    return FLOATCONST;
+                }
+                break;
             default:
                 fail();
                 return -1;
