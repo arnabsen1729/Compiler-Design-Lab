@@ -149,10 +149,28 @@ int yylex() {
                     state = 22;  //! token for "^"
                 } else if (isdigit(c)) {
                     state = 23;  //! token for integer constant
+                } else if (c == '(') {
+                    state = 26;  //! token for "("
+                } else if (c == ')') {
+                    state = 27;  //! token for ")"
+                } else if (c == '{') {
+                    state = 29;  //! token for "{"
+                } else if (c == '}') {
+                    state = 30;  //! token for "}"
+                } else if (c == '[') {
+                    state = 28;  //! token for "["
+                } else if (c == ']') {
+                    state = 32;  //! token for "]"
+                } else if (c == ';') {
+                    state = 31;  //! token for ";"
+                } else if (c == 'i') {
+                    state = 34;  //! token for "int"
+                } else if (c == '_' || isalpha(c)) {
+                    state = 33;  //! token for identifier
+                } else {
+                    fail();
                 }
 
-                else
-                    fail();
                 break;
             case 1:  //! token for "<"
                 c = nextchar();
@@ -360,6 +378,79 @@ int yylex() {
                     return FLOATCONST;
                 }
                 break;
+            case 26:  //! token for "("
+                logger("LPAREN_TOK");
+                state_reset();
+                return LPAREN_TOK;
+            case 27:  //! token for ")"
+                logger("RPAREN_TOK");
+                state_reset();
+                return RPAREN_TOK;
+            case 28:  //! token or "["
+                logger("LBRACKET_TOK");
+                state_reset();
+                return LBRACKET_TOK;
+            case 29:  //! token for "{"
+                logger("LBRACE_TOK");
+                state_reset();
+                return LBRACE_TOK;
+            case 30:  //! token for "}"
+                logger("RBRACE_TOK");
+                state_reset();
+                return RBRACE_TOK;
+            case 31:  //! token for "!"
+                logger("SEMICOLON_TOK");
+                state_reset();
+                return SEMICOLON_TOK;
+            case 32:  //! token for "]"
+                logger("RBRACKET_TOK");
+                state_reset();
+                return RBRACKET_TOK;
+            case 33:
+                c = nextchar();
+                if (c == 0) return EOF_TOK;
+                if (isalpha(c) || c == '_') {
+                    state = 33;  //! token for identifier
+                } else {
+                    set_lookahead(c);
+                    logger("ID_TOK");
+                    state_reset();
+                    return ID_TOK;
+                }
+                break;
+            case 34:
+                c = nextchar();
+                if (c == 0) return EOF_TOK;
+                if (c == 'n') {
+                    state = 35;  //! reached "in"
+                } else if (isalpha(c) || c == '_') {
+                    state = 33;  //! token for identifier
+                } else {
+                    set_lookahead(c);
+                    logger("ID_TOK");
+                    state_reset();
+                    return ID_TOK;
+                }
+                break;
+            case 35:  //! state "in"
+                c = nextchar();
+                if (c == 0) return EOF_TOK;
+                if (c == 't') {
+                    state = 36;  //! reached "int"
+                } else if (isalpha(c) || c == '_') {
+                    state = 33;  //! token for identifier
+                } else {
+                    set_lookahead(c);
+                    logger("ID_TOK");
+                    state_reset();
+                    return ID_TOK;
+                }
+                break;
+            case 36:  //! token for "int"
+                c = nextchar();
+                logger("INT_TOK");
+                state_reset();
+                return INT_TOK;
             default:
                 fail();
                 return -1;
