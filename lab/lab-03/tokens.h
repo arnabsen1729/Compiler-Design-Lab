@@ -68,3 +68,5 @@
 #define ID_TOK 350
 #define INTCONST 351
 #define FLOATCONST 352
+#define CHARCONST 353
+#define STRCONST 354

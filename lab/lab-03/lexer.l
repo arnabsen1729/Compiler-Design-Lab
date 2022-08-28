@@ -2,8 +2,10 @@ letter      [a-zA-Z]
 digit       [0-9]
 identifier  [a-zA-Z_][a-zA-Z0-9_]*
 intconst    [+\-]?{digit}+
-floatconst   [+\-]?{digit}*\.{digit}+(e[+\-]?{digit}+)?
-delimiter   [ \t\n]
+floatconst  [+\-]?{digit}*\.{digit}+(e[+\-]?{digit}+)?
+charconst   \'{letter}\'
+stringconst \".*\"
+delimiter   [ \t]
 
 %{
     #include <stdio.h>
@@ -56,6 +58,9 @@ return          return (RETURN_TOK);
 {identifier}    return (ID_TOK);
 {intconst}      return (INTCONST);
 {floatconst}    return (FLOATCONST);
+{charconst}     return (CHARCONST);
+{stringconst}   return (STRCONST);
+\n              {yylineno++;}
 {delimiter}+ ;
 %%
 
@@ -76,7 +81,7 @@ int main(int argc, char *argv[])
            "Line #",
            "Token ID", 
            "Value");
-    printf("====================================\n");
+    printf("===========================\n");
 
 
     int token;

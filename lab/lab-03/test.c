@@ -23,5 +23,8 @@ int main() {
         b += 1;
     }
 
+    char s = 'a';
+    char p[] = "hello world";
+
     return 0;
 }
