@@ -85,10 +85,8 @@ At each phase, it interacts with the **Symbol Table Manager** and for errors it 
 
 The different phases of compilations can be broadly classified into:
 
-1. **Analysis Phase** breaks up the source program into constituent pieces and creates an intermediate representation of the source program, also detects errors.
-2. **Synthesis Phase** constructs the desired target program from
-the intermediate representation and the information in the
-symbol table.
+1. **Analysis Phase** breaks up the source program into constituent pieces and creates an intermediate representation of the source program, also detects errors. Lexical Analyzer, Syntax Analyzer and Semantic Analyzer comes under Analysis Phase.
+2. **Synthesis Phase** constructs the desired target program from the intermediate representation and the information in the symbol table. Intermediate Code Generator, Code Optimizer and Code Generator come under Synthesis Phase.
 
 ### Lexical Analyzer
 
