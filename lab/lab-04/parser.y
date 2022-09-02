@@ -91,7 +91,13 @@ void parsed(const char * msg) {
 %start S
 
 %%
-S               :  datatype  MAIN_TOK LPAREN_TOK RPAREN_TOK block       {parsed("main function");}
+S               : S statement
+                | S main
+                | statement
+                | main
+                ;
+
+main            : datatype  MAIN_TOK LPAREN_TOK RPAREN_TOK block       {parsed("main function");}
                 ;
 
 block           : LBRACE_TOK  statements  blocks  RBRACE_TOK
@@ -105,12 +111,23 @@ statements      : statements  statement
                 | // required for empty statement
                 ;
 
-statement       : DECLARATION SEMICOLON_TOK
+statement       : declaration SEMICOLON_TOK
+                | assignment SEMICOLON_TOK
                 ;
 
 
-DECLARATION     :datatype id_token      {parsed("declaration statement");}
+declaration     : datatype id_token      {parsed("declaration statement");}
                 ;
+
+assignment      : datatype id_token EQ_TOK data    {parsed("assignment statement");}
+                ;              
+
+data            : id_token
+                | INTCONST
+                | FLOATCONST
+                | CHARCONST
+                | STRCONST
+                ;  
 
 datatype        : INT_TOK
                 | VOID_TOK
