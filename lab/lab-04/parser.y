@@ -113,21 +113,48 @@ statements      : statements  statement
 
 statement       : declaration SEMICOLON_TOK
                 | assignment SEMICOLON_TOK
+                | if_statement
                 ;
 
 
 declaration     : datatype id_token      {parsed("declaration statement");}
                 ;
 
-assignment      : datatype id_token EQ_TOK data    {parsed("assignment statement");}
-                ;              
+assignment      : datatype id_token EQ_TOK expression    {parsed("assignment statement");}
+                ;     
 
-data            : id_token
+expression      : id_token
                 | INTCONST
                 | FLOATCONST
                 | CHARCONST
                 | STRCONST
+                | LPAREN_TOK expression RPAREN_TOK
+                | expression arithmetic_op expression
                 ;  
+
+if_statement    : IF_TOK LPAREN_TOK condition RPAREN_TOK block                  {parsed("if statement");}
+                | IF_TOK LPAREN_TOK condition RPAREN_TOK block ELSE_TOK block   {parsed("if-else statement");}
+                | IF_TOK LPAREN_TOK condition RPAREN_TOK block ELSE_TOK if_statement {parsed("else-if statement");}
+                ;
+
+condition       : expression relational_op expression
+                | expression
+                ;
+
+arithmetic_op   : PLUS_TOK
+                | MINUS_TOK
+                | MULT_TOK
+                | DIV_TOK
+                | MOD_TOK
+                ;
+
+relational_op   : LT_TOK
+                | GT_TOK
+                | EQ_TOK
+                | LT_EQ_TOK
+                | GT_EQ_TOK
+                | EQ_EQ_TOK
+                ;
 
 datatype        : INT_TOK
                 | VOID_TOK
