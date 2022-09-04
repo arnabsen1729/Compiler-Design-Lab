@@ -107,15 +107,19 @@ blocks          : block statements blocks
                 | // required for empty block
                 ;
 
-statements      : statements  statement
+statements      : statements statement
+                | statements if_statement
+                | statements for_statement
                 | // required for empty statement
                 ;
 
-statement       : declaration SEMICOLON_TOK
-                | assignment SEMICOLON_TOK
-                | if_statement
+statement       : operation SEMICOLON_TOK
                 ;
 
+operation       : declaration
+                | assignment
+                | expression
+                ;
 
 declaration     : datatype id_token      {parsed("declaration statement");}
                 ;
@@ -128,6 +132,7 @@ expression      : id_token
                 | FLOATCONST
                 | CHARCONST
                 | STRCONST
+                | SEMICOLON_TOK
                 | LPAREN_TOK expression RPAREN_TOK
                 | expression arithmetic_op expression
                 ;  
@@ -135,6 +140,9 @@ expression      : id_token
 if_statement    : IF_TOK LPAREN_TOK condition RPAREN_TOK block                  {parsed("if statement");}
                 | IF_TOK LPAREN_TOK condition RPAREN_TOK block ELSE_TOK block   {parsed("if-else statement");}
                 | IF_TOK LPAREN_TOK condition RPAREN_TOK block ELSE_TOK if_statement {parsed("else-if statement");}
+                ;
+
+for_statement   : FOR_TOK LPAREN_TOK operation SEMICOLON_TOK operation SEMICOLON_TOK operation RPAREN_TOK block {parsed("for statement");}
                 ;
 
 condition       : expression relational_op expression
