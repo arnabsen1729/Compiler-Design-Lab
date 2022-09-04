@@ -1,30 +1,38 @@
-int c = 100;
-int hello() {
+int myconst = 100;
+
+int helloWorld() {
+    printf("helo world");
     return 0;
 }
 
-int hi(int n, int m) {
-    return 0;
+int add(int n, int m) {
+    return (n + m);
 }
 
 int main() {
-    int s = (10 + (4 * 2)) + c;
-    if (10 < 2) {
-        int s;
-    } else if (10 > 2) {
-        int s;
-    }
-    if (10 < 2) {
-        int s;
-    }
-
-    for (4 + 5; 3; 3) {
-        int s;
+    int a = 10;
+    float b = (a + 10.0) * 100;
+    char c = 'a';
+    c = 'b';
+    if (a == 10) {
+        printf("a is 10");
+    } else if (a > 10) {
+        printf("a is greater than 10");
+    } else {
+        printf("a is less than 10");
     }
 
-    while (10 < 2) {
-        int s;
+    for (int i = 10; i < 10; i = i + 1) {
+        printf("Iterative statements");
     }
 
+    int counter = 0;
+    while (counter < 10) {
+        printf("Iterative statements");
+        counter = counter + 1;
+    }
+
+    helloWorld();
+    int x = add(10, 20);
     return 0;
 }

@@ -117,32 +117,44 @@ statements      : statements statement
                 ;
 
 statement       : operation SEMICOLON_TOK
+                | function_call SEMICOLON_TOK
                 | return_statement
                 ;
 
 operation       : declaration
                 | assignment
                 | expression
+                | condition
                 ;
 
 declaration     : datatype id_token      {parsed("declaration statement");}
                 ;
 
 assignment      : datatype id_token EQ_TOK expression    {parsed("assignment statement");}
+                | id_token EQ_TOK expression              {parsed("assignment statement");}
                 ;     
 
 return_statement: RETURN_TOK expression SEMICOLON_TOK    {parsed("return statement");}
                 ;
 
-function        : datatype id_token LPAREN_TOK args RPAREN_TOK block {parsed("function");}
+function        : datatype id_token LPAREN_TOK params RPAREN_TOK block {parsed("function");}
                 ;
 
-args            : datatype id_token COMMA_TOK args
+params          : datatype id_token COMMA_TOK params
                 | datatype id_token     
-                | // required for empty args
+                | // required for empty params
                 ;                
 
-expression      : id_token
+function_call   : id_token LPAREN_TOK args RPAREN_TOK {parsed("function call");}
+                ;
+
+args            : expression COMMA_TOK args
+                | expression
+                | // required for empty args
+                ;           
+
+expression      : function_call
+                | id_token
                 | INTCONST
                 | FLOATCONST
                 | CHARCONST
@@ -150,6 +162,7 @@ expression      : id_token
                 | SEMICOLON_TOK
                 | LPAREN_TOK expression RPAREN_TOK
                 | expression arithmetic_op expression
+                | expression relational_op expression
                 ;  
 
 if_statement    : IF_TOK LPAREN_TOK condition RPAREN_TOK block                  {parsed("if statement");}
