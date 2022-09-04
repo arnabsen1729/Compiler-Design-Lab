@@ -50,6 +50,8 @@ delimiter   [ \t]
 "&&"            return (LOG_AND_TOK);
 "||"            return (LOG_OR_TOK);
 ","             return (COMMA_TOK);
+"++"            return (PLUS_PLUS_TOK);
+"--"            return (MINUS_MINUS_TOK);
 main            return (MAIN_TOK);
 while           return (WHILE_TOK);
 for             return (FOR_TOK);

@@ -75,6 +75,11 @@ void parsed(const char * msg) {
 %token DIV_EQ_TOK
 %token MOD_EQ_TOK
 
+// [ Increment & Decrement Operators ]
+
+%token PLUS_PLUS_TOK
+%token MINUS_MINUS_TOK
+
 // [ Logical Operators ]
 
 %token LOG_AND_TOK
@@ -117,7 +122,6 @@ statements      : statements statement
                 ;
 
 statement       : operation SEMICOLON_TOK
-                | function_call SEMICOLON_TOK
                 | return_statement
                 ;
 
@@ -163,6 +167,8 @@ expression      : function_call
                 | LPAREN_TOK expression RPAREN_TOK
                 | expression arithmetic_op expression
                 | expression relational_op expression
+                | expression PLUS_PLUS_TOK
+                | expression MINUS_MINUS_TOK
                 ;  
 
 if_statement    : IF_TOK LPAREN_TOK condition RPAREN_TOK block                  {parsed("if statement");}
@@ -185,6 +191,11 @@ arithmetic_op   : PLUS_TOK
                 | MULT_TOK
                 | DIV_TOK
                 | MOD_TOK
+                | PLUS_EQ_TOK
+                | MINUS_EQ_TOK
+                | MULT_EQ_TOK
+                | DIV_EQ_TOK
+                | MOD_EQ_TOK
                 ;
 
 relational_op   : LT_TOK

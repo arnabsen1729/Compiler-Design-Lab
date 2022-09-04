@@ -22,7 +22,7 @@ int main() {
         printf("a is less than 10");
     }
 
-    for (int i = 10; i < 10; i = i + 1) {
+    for (int i = 10; i < 10; i++) {
         printf("Iterative statements");
     }
 
