@@ -110,6 +110,7 @@ blocks          : block statements blocks
 statements      : statements statement
                 | statements if_statement
                 | statements for_statement
+                | statements while_statement
                 | // required for empty statement
                 ;
 
@@ -143,6 +144,9 @@ if_statement    : IF_TOK LPAREN_TOK condition RPAREN_TOK block                  
                 ;
 
 for_statement   : FOR_TOK LPAREN_TOK operation SEMICOLON_TOK operation SEMICOLON_TOK operation RPAREN_TOK block {parsed("for statement");}
+                ;
+
+while_statement : WHILE_TOK LPAREN_TOK condition RPAREN_TOK block {parsed("while statement");}
                 ;
 
 condition       : expression relational_op expression

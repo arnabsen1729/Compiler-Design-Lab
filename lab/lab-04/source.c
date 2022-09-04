@@ -13,4 +13,8 @@ int main() {
     for (4 + 5; 3; 3) {
         int s;
     }
+
+    while (10 < 2) {
+        int s;
+    }
 }
