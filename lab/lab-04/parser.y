@@ -93,8 +93,10 @@ void parsed(const char * msg) {
 %%
 S               : S statement
                 | S main
+                | S function
                 | statement
                 | main
+                | function
                 ;
 
 main            : datatype  MAIN_TOK LPAREN_TOK RPAREN_TOK block       {parsed("main function");}
@@ -115,6 +117,7 @@ statements      : statements statement
                 ;
 
 statement       : operation SEMICOLON_TOK
+                | return_statement
                 ;
 
 operation       : declaration
@@ -127,6 +130,17 @@ declaration     : datatype id_token      {parsed("declaration statement");}
 
 assignment      : datatype id_token EQ_TOK expression    {parsed("assignment statement");}
                 ;     
+
+return_statement: RETURN_TOK expression SEMICOLON_TOK    {parsed("return statement");}
+                ;
+
+function        : datatype id_token LPAREN_TOK args RPAREN_TOK block {parsed("function");}
+                ;
+
+args            : datatype id_token COMMA_TOK args
+                | datatype id_token     
+                | // required for empty args
+                ;                
 
 expression      : id_token
                 | INTCONST
