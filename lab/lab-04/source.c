@@ -24,6 +24,10 @@ int main() {
 
     for (int i = 10; i < 10; i++) {
         printf("Iterative statements");
+        for (int i = 10; i < 10; i++) {
+            printf("Iterative statements");
+        }
+        
     }
 
     int counter = 0;

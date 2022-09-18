@@ -1,11 +1,34 @@
 %{
 
 #include "lex.yy.c"
+#include "hash.c"
+#include <stdbool.h>
 
 void yyerror(char *);
 
 void parsed(const char * msg) {
     printf("[line: %d] => %s syntax is OK\n", yylineno, msg);
+}
+
+int scope = 0;
+int dtype = 0;
+symbol_table *table;
+
+void add_variable(symbol_table *t, char *name, int dtype) {
+    symbol *var = create_symbol(name, dtype, scope, yylineno);
+    insert_table(t, var);
+}
+
+bool is_declared(symbol_table *t, char *name) {
+    symbol *var = lookup_table(t, name, scope);
+    if (var == NULL) {
+        return false;
+    }
+    return true;
+}
+
+void delete_variables(symbol_table *t) {
+    remove_table(t, scope);
 }
 
 %}
@@ -104,10 +127,18 @@ S               : S statement
                 | function
                 ;
 
+open_paren      : LBRACE_TOK    { scope++; }
+                ;
+
+close_paren     : RBRACE_TOK    { delete_variables(table); scope--; }
+                ;
+
+
 main            : datatype  MAIN_TOK LPAREN_TOK RPAREN_TOK block       {parsed("main function");}
                 ;
 
-block           : LBRACE_TOK  statements  blocks  RBRACE_TOK
+
+block           : open_paren  statements  blocks  close_paren 
                 ;
 
 blocks          : block statements blocks
@@ -131,11 +162,25 @@ operation       : declaration
                 | condition
                 ;
 
-declaration     : datatype id_token                      {parsed("declaration statement");}
+declaration     : datatype id_token                      {
+    parsed("declaration statement");
+    add_variable(table, var_name, dtype);
+    iterate_table(table);
+}
                 ;
 
-assignment      : datatype id_token EQ_TOK expression    {parsed("assignment statement");}
-                | id_token EQ_TOK expression              {parsed("assignment statement");}
+assignment      : datatype id_token EQ_TOK expression    {
+    add_variable(table, var_name, dtype);
+    iterate_table(table);
+    parsed("assignment statement");
+}
+                | id_token EQ_TOK expression              {
+    if(!is_declared(table, var_name)) {
+        yyerror("variable not declared");
+        return 1;
+    } 
+    parsed("assignment statement");
+}
                 ;     
 
 return_statement: RETURN_TOK expression SEMICOLON_TOK    {parsed("return statement");}
@@ -158,7 +203,12 @@ args            : expression COMMA_TOK args
                 ;           
 
 expression      : function_call
-                | id_token
+                | id_token                                                     {
+    if(!is_declared(table, var_name)) {
+        yyerror("variable not declared");
+        return 1;
+    }
+                }
                 | INTCONST
                 | FLOATCONST
                 | CHARCONST
@@ -206,10 +256,10 @@ relational_op   : LT_TOK
                 | EQ_EQ_TOK
                 ;
 
-datatype        : INT_TOK
-                | VOID_TOK
-                | CHAR_TOK
-                | FLOAT_TOK
+datatype        : INT_TOK       { dtype = INT_TOK; }
+                | VOID_TOK      { dtype = VOID_TOK; }
+                | CHAR_TOK      { dtype = CHAR_TOK; }
+                | FLOAT_TOK     { dtype = FLOAT_TOK; }
                 ;
 
 id_token        : id_token COMMA_TOK ID_TOK
@@ -219,14 +269,16 @@ id_token        : id_token COMMA_TOK ID_TOK
 %%
 
 void yyerror(char *s) {
-	printf("yyerror: %s\n", s);
+	printf("SYNTAX ERROR: %s LINE NUMBER: %d\n", s, yylineno);
 }
 
 int main()
 {
-   if (yyparse()==0) printf("\nPARSING COMPLETED SUCCESSFULLY ✅\n");
-   else printf("\nPARSING ERROR (at line no:  %d) ❌\n", yylineno);
+    table = create_table();
 
-   return(0);	
+    if (yyparse()==0) printf("\nPARSING COMPLETED SUCCESSFULLY ✅\n");
+    else printf("\nPARSING ERROR (at line no:  %d) ❌\n", yylineno);
+
+    return(0);	
 
 }
