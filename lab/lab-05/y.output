@@ -1,0 +1,1665 @@
+   0  $accept : S $end
+
+   1  S : S statement
+   2    | S main
+   3    | S function
+   4    | statement
+   5    | main
+   6    | function
+
+   7  open_paren : LBRACE_TOK
+
+   8  close_paren : RBRACE_TOK
+
+   9  main : datatype MAIN_TOK LPAREN_TOK RPAREN_TOK block
+
+  10  block : open_paren statements blocks close_paren
+
+  11  blocks : block statements blocks
+  12         |
+
+  13  statements : statements statement
+  14             | statements if_statement
+  15             | statements for_statement
+  16             | statements while_statement
+  17             |
+
+  18  statement : operation SEMICOLON_TOK
+  19            | return_statement
+
+  20  operation : declaration
+  21            | assignment
+  22            | expression
+  23            | condition
+
+  24  declaration : datatype id_token
+
+  25  assignment : datatype id_token EQ_TOK expression
+  26             | id_token EQ_TOK expression
+
+  27  return_statement : RETURN_TOK expression SEMICOLON_TOK
+
+  28  function : datatype id_token LPAREN_TOK params RPAREN_TOK block
+
+  29  params : datatype id_token COMMA_TOK params
+  30         | datatype id_token
+  31         |
+
+  32  function_call : id_token LPAREN_TOK args RPAREN_TOK
+
+  33  args : expression COMMA_TOK args
+  34       | expression
+  35       |
+
+  36  expression : function_call
+  37             | id_token
+  38             | INTCONST
+  39             | FLOATCONST
+  40             | CHARCONST
+  41             | STRCONST
+  42             | SEMICOLON_TOK
+  43             | LPAREN_TOK expression RPAREN_TOK
+  44             | expression arithmetic_op expression
+  45             | expression relational_op expression
+  46             | expression PLUS_PLUS_TOK
+  47             | expression MINUS_MINUS_TOK
+
+  48  if_statement : IF_TOK LPAREN_TOK condition RPAREN_TOK block
+  49               | IF_TOK LPAREN_TOK condition RPAREN_TOK block ELSE_TOK block
+  50               | IF_TOK LPAREN_TOK condition RPAREN_TOK block ELSE_TOK if_statement
+
+  51  for_statement : FOR_TOK LPAREN_TOK operation SEMICOLON_TOK operation SEMICOLON_TOK operation RPAREN_TOK block
+
+  52  while_statement : WHILE_TOK LPAREN_TOK condition RPAREN_TOK block
+
+  53  condition : expression relational_op expression
+  54            | expression
+
+  55  arithmetic_op : PLUS_TOK
+  56                | MINUS_TOK
+  57                | MULT_TOK
+  58                | DIV_TOK
+  59                | MOD_TOK
+  60                | PLUS_EQ_TOK
+  61                | MINUS_EQ_TOK
+  62                | MULT_EQ_TOK
+  63                | DIV_EQ_TOK
+  64                | MOD_EQ_TOK
+
+  65  relational_op : LT_TOK
+  66                | GT_TOK
+  67                | EQ_TOK
+  68                | LT_EQ_TOK
+  69                | GT_EQ_TOK
+  70                | EQ_EQ_TOK
+
+  71  datatype : INT_TOK
+  72           | VOID_TOK
+  73           | CHAR_TOK
+  74           | FLOAT_TOK
+
+  75  id_token : id_token COMMA_TOK ID_TOK
+  76           | ID_TOK
+
+state 0
+	$accept : . S $end  (0)
+
+	LPAREN_TOK  shift 1
+	SEMICOLON_TOK  shift 2
+	VOID_TOK  shift 3
+	INT_TOK  shift 4
+	FLOAT_TOK  shift 5
+	CHAR_TOK  shift 6
+	RETURN_TOK  shift 7
+	ID_TOK  shift 8
+	INTCONST  shift 9
+	FLOATCONST  shift 10
+	CHARCONST  shift 11
+	STRCONST  shift 12
+	.  error
+
+	S  goto 13
+	statement  goto 14
+	main  goto 15
+	function  goto 16
+	datatype  goto 17
+	operation  goto 18
+	return_statement  goto 19
+	declaration  goto 20
+	assignment  goto 21
+	expression  goto 22
+	condition  goto 23
+	id_token  goto 24
+	function_call  goto 25
+
+
+state 1
+	expression : LPAREN_TOK . expression RPAREN_TOK  (43)
+
+	LPAREN_TOK  shift 1
+	SEMICOLON_TOK  shift 2
+	ID_TOK  shift 8
+	INTCONST  shift 9
+	FLOATCONST  shift 10
+	CHARCONST  shift 11
+	STRCONST  shift 12
+	.  error
+
+	expression  goto 26
+	id_token  goto 27
+	function_call  goto 25
+
+
+state 2
+	expression : SEMICOLON_TOK .  (42)
+
+	.  reduce 42
+
+
+state 3
+	datatype : VOID_TOK .  (72)
+
+	.  reduce 72
+
+
+state 4
+	datatype : INT_TOK .  (71)
+
+	.  reduce 71
+
+
+state 5
+	datatype : FLOAT_TOK .  (74)
+
+	.  reduce 74
+
+
+state 6
+	datatype : CHAR_TOK .  (73)
+
+	.  reduce 73
+
+
+state 7
+	return_statement : RETURN_TOK . expression SEMICOLON_TOK  (27)
+
+	LPAREN_TOK  shift 1
+	SEMICOLON_TOK  shift 2
+	ID_TOK  shift 8
+	INTCONST  shift 9
+	FLOATCONST  shift 10
+	CHARCONST  shift 11
+	STRCONST  shift 12
+	.  error
+
+	expression  goto 28
+	id_token  goto 27
+	function_call  goto 25
+
+
+state 8
+	id_token : ID_TOK .  (76)
+
+	.  reduce 76
+
+
+state 9
+	expression : INTCONST .  (38)
+
+	.  reduce 38
+
+
+state 10
+	expression : FLOATCONST .  (39)
+
+	.  reduce 39
+
+
+state 11
+	expression : CHARCONST .  (40)
+
+	.  reduce 40
+
+
+state 12
+	expression : STRCONST .  (41)
+
+	.  reduce 41
+
+
+state 13
+	$accept : S . $end  (0)
+	S : S . statement  (1)
+	S : S . main  (2)
+	S : S . function  (3)
+
+	$end  accept
+	LPAREN_TOK  shift 1
+	SEMICOLON_TOK  shift 2
+	VOID_TOK  shift 3
+	INT_TOK  shift 4
+	FLOAT_TOK  shift 5
+	CHAR_TOK  shift 6
+	RETURN_TOK  shift 7
+	ID_TOK  shift 8
+	INTCONST  shift 9
+	FLOATCONST  shift 10
+	CHARCONST  shift 11
+	STRCONST  shift 12
+	.  error
+
+	statement  goto 29
+	main  goto 30
+	function  goto 31
+	datatype  goto 17
+	operation  goto 18
+	return_statement  goto 19
+	declaration  goto 20
+	assignment  goto 21
+	expression  goto 22
+	condition  goto 23
+	id_token  goto 24
+	function_call  goto 25
+
+
+state 14
+	S : statement .  (4)
+
+	.  reduce 4
+
+
+state 15
+	S : main .  (5)
+
+	.  reduce 5
+
+
+state 16
+	S : function .  (6)
+
+	.  reduce 6
+
+
+state 17
+	main : datatype . MAIN_TOK LPAREN_TOK RPAREN_TOK block  (9)
+	declaration : datatype . id_token  (24)
+	assignment : datatype . id_token EQ_TOK expression  (25)
+	function : datatype . id_token LPAREN_TOK params RPAREN_TOK block  (28)
+
+	MAIN_TOK  shift 32
+	ID_TOK  shift 8
+	.  error
+
+	id_token  goto 33
+
+
+state 18
+	statement : operation . SEMICOLON_TOK  (18)
+
+	SEMICOLON_TOK  shift 34
+	.  error
+
+
+state 19
+	statement : return_statement .  (19)
+
+	.  reduce 19
+
+
+state 20
+	operation : declaration .  (20)
+
+	.  reduce 20
+
+
+state 21
+	operation : assignment .  (21)
+
+	.  reduce 21
+
+
+22: reduce/reduce conflict (reduce 22, reduce 54) on RPAREN_TOK
+22: reduce/reduce conflict (reduce 22, reduce 54) on SEMICOLON_TOK
+state 22
+	operation : expression .  (22)
+	expression : expression . arithmetic_op expression  (44)
+	expression : expression . relational_op expression  (45)
+	expression : expression . PLUS_PLUS_TOK  (46)
+	expression : expression . MINUS_MINUS_TOK  (47)
+	condition : expression . relational_op expression  (53)
+	condition : expression .  (54)
+
+	LT_TOK  shift 35
+	GT_TOK  shift 36
+	EQ_TOK  shift 37
+	MINUS_TOK  shift 38
+	PLUS_TOK  shift 39
+	MULT_TOK  shift 40
+	DIV_TOK  shift 41
+	MOD_TOK  shift 42
+	LT_EQ_TOK  shift 43
+	GT_EQ_TOK  shift 44
+	EQ_EQ_TOK  shift 45
+	PLUS_EQ_TOK  shift 46
+	MINUS_EQ_TOK  shift 47
+	MULT_EQ_TOK  shift 48
+	DIV_EQ_TOK  shift 49
+	MOD_EQ_TOK  shift 50
+	PLUS_PLUS_TOK  shift 51
+	MINUS_MINUS_TOK  shift 52
+	RPAREN_TOK  reduce 22
+	SEMICOLON_TOK  reduce 22
+
+	arithmetic_op  goto 53
+	relational_op  goto 54
+
+
+state 23
+	operation : condition .  (23)
+
+	.  reduce 23
+
+
+24: shift/reduce conflict (shift 55, reduce 37) on EQ_TOK
+state 24
+	assignment : id_token . EQ_TOK expression  (26)
+	function_call : id_token . LPAREN_TOK args RPAREN_TOK  (32)
+	expression : id_token .  (37)
+	id_token : id_token . COMMA_TOK ID_TOK  (75)
+
+	EQ_TOK  shift 55
+	LPAREN_TOK  shift 56
+	COMMA_TOK  shift 57
+	LT_TOK  reduce 37
+	GT_TOK  reduce 37
+	MINUS_TOK  reduce 37
+	PLUS_TOK  reduce 37
+	MULT_TOK  reduce 37
+	DIV_TOK  reduce 37
+	MOD_TOK  reduce 37
+	RPAREN_TOK  reduce 37
+	SEMICOLON_TOK  reduce 37
+	LT_EQ_TOK  reduce 37
+	GT_EQ_TOK  reduce 37
+	EQ_EQ_TOK  reduce 37
+	PLUS_EQ_TOK  reduce 37
+	MINUS_EQ_TOK  reduce 37
+	MULT_EQ_TOK  reduce 37
+	DIV_EQ_TOK  reduce 37
+	MOD_EQ_TOK  reduce 37
+	PLUS_PLUS_TOK  reduce 37
+	MINUS_MINUS_TOK  reduce 37
+
+
+state 25
+	expression : function_call .  (36)
+
+	.  reduce 36
+
+
+state 26
+	expression : LPAREN_TOK expression . RPAREN_TOK  (43)
+	expression : expression . arithmetic_op expression  (44)
+	expression : expression . relational_op expression  (45)
+	expression : expression . PLUS_PLUS_TOK  (46)
+	expression : expression . MINUS_MINUS_TOK  (47)
+
+	LT_TOK  shift 35
+	GT_TOK  shift 36
+	EQ_TOK  shift 37
+	MINUS_TOK  shift 38
+	PLUS_TOK  shift 39
+	MULT_TOK  shift 40
+	DIV_TOK  shift 41
+	MOD_TOK  shift 42
+	RPAREN_TOK  shift 58
+	LT_EQ_TOK  shift 43
+	GT_EQ_TOK  shift 44
+	EQ_EQ_TOK  shift 45
+	PLUS_EQ_TOK  shift 46
+	MINUS_EQ_TOK  shift 47
+	MULT_EQ_TOK  shift 48
+	DIV_EQ_TOK  shift 49
+	MOD_EQ_TOK  shift 50
+	PLUS_PLUS_TOK  shift 51
+	MINUS_MINUS_TOK  shift 52
+	.  error
+
+	arithmetic_op  goto 53
+	relational_op  goto 59
+
+
+27: shift/reduce conflict (shift 57, reduce 37) on COMMA_TOK
+state 27
+	function_call : id_token . LPAREN_TOK args RPAREN_TOK  (32)
+	expression : id_token .  (37)
+	id_token : id_token . COMMA_TOK ID_TOK  (75)
+
+	LPAREN_TOK  shift 56
+	COMMA_TOK  shift 57
+	LT_TOK  reduce 37
+	GT_TOK  reduce 37
+	EQ_TOK  reduce 37
+	MINUS_TOK  reduce 37
+	PLUS_TOK  reduce 37
+	MULT_TOK  reduce 37
+	DIV_TOK  reduce 37
+	MOD_TOK  reduce 37
+	RPAREN_TOK  reduce 37
+	SEMICOLON_TOK  reduce 37
+	LT_EQ_TOK  reduce 37
+	GT_EQ_TOK  reduce 37
+	EQ_EQ_TOK  reduce 37
+	PLUS_EQ_TOK  reduce 37
+	MINUS_EQ_TOK  reduce 37
+	MULT_EQ_TOK  reduce 37
+	DIV_EQ_TOK  reduce 37
+	MOD_EQ_TOK  reduce 37
+	PLUS_PLUS_TOK  reduce 37
+	MINUS_MINUS_TOK  reduce 37
+
+
+state 28
+	return_statement : RETURN_TOK expression . SEMICOLON_TOK  (27)
+	expression : expression . arithmetic_op expression  (44)
+	expression : expression . relational_op expression  (45)
+	expression : expression . PLUS_PLUS_TOK  (46)
+	expression : expression . MINUS_MINUS_TOK  (47)
+
+	LT_TOK  shift 35
+	GT_TOK  shift 36
+	EQ_TOK  shift 37
+	MINUS_TOK  shift 38
+	PLUS_TOK  shift 39
+	MULT_TOK  shift 40
+	DIV_TOK  shift 41
+	MOD_TOK  shift 42
+	SEMICOLON_TOK  shift 60
+	LT_EQ_TOK  shift 43
+	GT_EQ_TOK  shift 44
+	EQ_EQ_TOK  shift 45
+	PLUS_EQ_TOK  shift 46
+	MINUS_EQ_TOK  shift 47
+	MULT_EQ_TOK  shift 48
+	DIV_EQ_TOK  shift 49
+	MOD_EQ_TOK  shift 50
+	PLUS_PLUS_TOK  shift 51
+	MINUS_MINUS_TOK  shift 52
+	.  error
+
+	arithmetic_op  goto 53
+	relational_op  goto 59
+
+
+state 29
+	S : S statement .  (1)
+
+	.  reduce 1
+
+
+state 30
+	S : S main .  (2)
+
+	.  reduce 2
+
+
+state 31
+	S : S function .  (3)
+
+	.  reduce 3
+
+
+state 32
+	main : datatype MAIN_TOK . LPAREN_TOK RPAREN_TOK block  (9)
+
+	LPAREN_TOK  shift 61
+	.  error
+
+
+state 33
+	declaration : datatype id_token .  (24)
+	assignment : datatype id_token . EQ_TOK expression  (25)
+	function : datatype id_token . LPAREN_TOK params RPAREN_TOK block  (28)
+	id_token : id_token . COMMA_TOK ID_TOK  (75)
+
+	EQ_TOK  shift 62
+	LPAREN_TOK  shift 63
+	COMMA_TOK  shift 57
+	SEMICOLON_TOK  reduce 24
+
+
+state 34
+	statement : operation SEMICOLON_TOK .  (18)
+
+	.  reduce 18
+
+
+state 35
+	relational_op : LT_TOK .  (65)
+
+	.  reduce 65
+
+
+state 36
+	relational_op : GT_TOK .  (66)
+
+	.  reduce 66
+
+
+state 37
+	relational_op : EQ_TOK .  (67)
+
+	.  reduce 67
+
+
+state 38
+	arithmetic_op : MINUS_TOK .  (56)
+
+	.  reduce 56
+
+
+state 39
+	arithmetic_op : PLUS_TOK .  (55)
+
+	.  reduce 55
+
+
+state 40
+	arithmetic_op : MULT_TOK .  (57)
+
+	.  reduce 57
+
+
+state 41
+	arithmetic_op : DIV_TOK .  (58)
+
+	.  reduce 58
+
+
+state 42
+	arithmetic_op : MOD_TOK .  (59)
+
+	.  reduce 59
+
+
+state 43
+	relational_op : LT_EQ_TOK .  (68)
+
+	.  reduce 68
+
+
+state 44
+	relational_op : GT_EQ_TOK .  (69)
+
+	.  reduce 69
+
+
+state 45
+	relational_op : EQ_EQ_TOK .  (70)
+
+	.  reduce 70
+
+
+state 46
+	arithmetic_op : PLUS_EQ_TOK .  (60)
+
+	.  reduce 60
+
+
+state 47
+	arithmetic_op : MINUS_EQ_TOK .  (61)
+
+	.  reduce 61
+
+
+state 48
+	arithmetic_op : MULT_EQ_TOK .  (62)
+
+	.  reduce 62
+
+
+state 49
+	arithmetic_op : DIV_EQ_TOK .  (63)
+
+	.  reduce 63
+
+
+state 50
+	arithmetic_op : MOD_EQ_TOK .  (64)
+
+	.  reduce 64
+
+
+state 51
+	expression : expression PLUS_PLUS_TOK .  (46)
+
+	.  reduce 46
+
+
+state 52
+	expression : expression MINUS_MINUS_TOK .  (47)
+
+	.  reduce 47
+
+
+state 53
+	expression : expression arithmetic_op . expression  (44)
+
+	LPAREN_TOK  shift 1
+	SEMICOLON_TOK  shift 2
+	ID_TOK  shift 8
+	INTCONST  shift 9
+	FLOATCONST  shift 10
+	CHARCONST  shift 11
+	STRCONST  shift 12
+	.  error
+
+	expression  goto 64
+	id_token  goto 27
+	function_call  goto 25
+
+
+state 54
+	expression : expression relational_op . expression  (45)
+	condition : expression relational_op . expression  (53)
+
+	LPAREN_TOK  shift 1
+	SEMICOLON_TOK  shift 2
+	ID_TOK  shift 8
+	INTCONST  shift 9
+	FLOATCONST  shift 10
+	CHARCONST  shift 11
+	STRCONST  shift 12
+	.  error
+
+	expression  goto 65
+	id_token  goto 27
+	function_call  goto 25
+
+
+state 55
+	assignment : id_token EQ_TOK . expression  (26)
+
+	LPAREN_TOK  shift 1
+	SEMICOLON_TOK  shift 2
+	ID_TOK  shift 8
+	INTCONST  shift 9
+	FLOATCONST  shift 10
+	CHARCONST  shift 11
+	STRCONST  shift 12
+	.  error
+
+	expression  goto 66
+	id_token  goto 27
+	function_call  goto 25
+
+
+state 56
+	function_call : id_token LPAREN_TOK . args RPAREN_TOK  (32)
+	args : .  (35)
+
+	LPAREN_TOK  shift 1
+	SEMICOLON_TOK  shift 2
+	ID_TOK  shift 8
+	INTCONST  shift 9
+	FLOATCONST  shift 10
+	CHARCONST  shift 11
+	STRCONST  shift 12
+	RPAREN_TOK  reduce 35
+
+	expression  goto 67
+	id_token  goto 27
+	function_call  goto 25
+	args  goto 68
+
+
+state 57
+	id_token : id_token COMMA_TOK . ID_TOK  (75)
+
+	ID_TOK  shift 69
+	.  error
+
+
+state 58
+	expression : LPAREN_TOK expression RPAREN_TOK .  (43)
+
+	.  reduce 43
+
+
+state 59
+	expression : expression relational_op . expression  (45)
+
+	LPAREN_TOK  shift 1
+	SEMICOLON_TOK  shift 2
+	ID_TOK  shift 8
+	INTCONST  shift 9
+	FLOATCONST  shift 10
+	CHARCONST  shift 11
+	STRCONST  shift 12
+	.  error
+
+	expression  goto 70
+	id_token  goto 27
+	function_call  goto 25
+
+
+state 60
+	return_statement : RETURN_TOK expression SEMICOLON_TOK .  (27)
+
+	.  reduce 27
+
+
+state 61
+	main : datatype MAIN_TOK LPAREN_TOK . RPAREN_TOK block  (9)
+
+	RPAREN_TOK  shift 71
+	.  error
+
+
+state 62
+	assignment : datatype id_token EQ_TOK . expression  (25)
+
+	LPAREN_TOK  shift 1
+	SEMICOLON_TOK  shift 2
+	ID_TOK  shift 8
+	INTCONST  shift 9
+	FLOATCONST  shift 10
+	CHARCONST  shift 11
+	STRCONST  shift 12
+	.  error
+
+	expression  goto 72
+	id_token  goto 27
+	function_call  goto 25
+
+
+state 63
+	function : datatype id_token LPAREN_TOK . params RPAREN_TOK block  (28)
+	params : .  (31)
+
+	VOID_TOK  shift 3
+	INT_TOK  shift 4
+	FLOAT_TOK  shift 5
+	CHAR_TOK  shift 6
+	RPAREN_TOK  reduce 31
+
+	datatype  goto 73
+	params  goto 74
+
+
+64: shift/reduce conflict (shift 35, reduce 44) on LT_TOK
+64: shift/reduce conflict (shift 36, reduce 44) on GT_TOK
+64: shift/reduce conflict (shift 37, reduce 44) on EQ_TOK
+64: shift/reduce conflict (shift 38, reduce 44) on MINUS_TOK
+64: shift/reduce conflict (shift 39, reduce 44) on PLUS_TOK
+64: shift/reduce conflict (shift 40, reduce 44) on MULT_TOK
+64: shift/reduce conflict (shift 41, reduce 44) on DIV_TOK
+64: shift/reduce conflict (shift 42, reduce 44) on MOD_TOK
+64: shift/reduce conflict (shift 43, reduce 44) on LT_EQ_TOK
+64: shift/reduce conflict (shift 44, reduce 44) on GT_EQ_TOK
+64: shift/reduce conflict (shift 45, reduce 44) on EQ_EQ_TOK
+64: shift/reduce conflict (shift 46, reduce 44) on PLUS_EQ_TOK
+64: shift/reduce conflict (shift 47, reduce 44) on MINUS_EQ_TOK
+64: shift/reduce conflict (shift 48, reduce 44) on MULT_EQ_TOK
+64: shift/reduce conflict (shift 49, reduce 44) on DIV_EQ_TOK
+64: shift/reduce conflict (shift 50, reduce 44) on MOD_EQ_TOK
+64: shift/reduce conflict (shift 51, reduce 44) on PLUS_PLUS_TOK
+64: shift/reduce conflict (shift 52, reduce 44) on MINUS_MINUS_TOK
+state 64
+	expression : expression . arithmetic_op expression  (44)
+	expression : expression arithmetic_op expression .  (44)
+	expression : expression . relational_op expression  (45)
+	expression : expression . PLUS_PLUS_TOK  (46)
+	expression : expression . MINUS_MINUS_TOK  (47)
+
+	LT_TOK  shift 35
+	GT_TOK  shift 36
+	EQ_TOK  shift 37
+	MINUS_TOK  shift 38
+	PLUS_TOK  shift 39
+	MULT_TOK  shift 40
+	DIV_TOK  shift 41
+	MOD_TOK  shift 42
+	LT_EQ_TOK  shift 43
+	GT_EQ_TOK  shift 44
+	EQ_EQ_TOK  shift 45
+	PLUS_EQ_TOK  shift 46
+	MINUS_EQ_TOK  shift 47
+	MULT_EQ_TOK  shift 48
+	DIV_EQ_TOK  shift 49
+	MOD_EQ_TOK  shift 50
+	PLUS_PLUS_TOK  shift 51
+	MINUS_MINUS_TOK  shift 52
+	RPAREN_TOK  reduce 44
+	SEMICOLON_TOK  reduce 44
+	COMMA_TOK  reduce 44
+
+	arithmetic_op  goto 53
+	relational_op  goto 59
+
+
+65: shift/reduce conflict (shift 35, reduce 45) on LT_TOK
+65: shift/reduce conflict (shift 36, reduce 45) on GT_TOK
+65: shift/reduce conflict (shift 37, reduce 45) on EQ_TOK
+65: shift/reduce conflict (shift 38, reduce 45) on MINUS_TOK
+65: shift/reduce conflict (shift 39, reduce 45) on PLUS_TOK
+65: shift/reduce conflict (shift 40, reduce 45) on MULT_TOK
+65: shift/reduce conflict (shift 41, reduce 45) on DIV_TOK
+65: shift/reduce conflict (shift 42, reduce 45) on MOD_TOK
+65: reduce/reduce conflict (reduce 45, reduce 53) on RPAREN_TOK
+65: reduce/reduce conflict (reduce 45, reduce 53) on SEMICOLON_TOK
+65: shift/reduce conflict (shift 43, reduce 45) on LT_EQ_TOK
+65: shift/reduce conflict (shift 44, reduce 45) on GT_EQ_TOK
+65: shift/reduce conflict (shift 45, reduce 45) on EQ_EQ_TOK
+65: shift/reduce conflict (shift 46, reduce 45) on PLUS_EQ_TOK
+65: shift/reduce conflict (shift 47, reduce 45) on MINUS_EQ_TOK
+65: shift/reduce conflict (shift 48, reduce 45) on MULT_EQ_TOK
+65: shift/reduce conflict (shift 49, reduce 45) on DIV_EQ_TOK
+65: shift/reduce conflict (shift 50, reduce 45) on MOD_EQ_TOK
+65: shift/reduce conflict (shift 51, reduce 45) on PLUS_PLUS_TOK
+65: shift/reduce conflict (shift 52, reduce 45) on MINUS_MINUS_TOK
+state 65
+	expression : expression . arithmetic_op expression  (44)
+	expression : expression . relational_op expression  (45)
+	expression : expression relational_op expression .  (45)
+	expression : expression . PLUS_PLUS_TOK  (46)
+	expression : expression . MINUS_MINUS_TOK  (47)
+	condition : expression relational_op expression .  (53)
+
+	LT_TOK  shift 35
+	GT_TOK  shift 36
+	EQ_TOK  shift 37
+	MINUS_TOK  shift 38
+	PLUS_TOK  shift 39
+	MULT_TOK  shift 40
+	DIV_TOK  shift 41
+	MOD_TOK  shift 42
+	LT_EQ_TOK  shift 43
+	GT_EQ_TOK  shift 44
+	EQ_EQ_TOK  shift 45
+	PLUS_EQ_TOK  shift 46
+	MINUS_EQ_TOK  shift 47
+	MULT_EQ_TOK  shift 48
+	DIV_EQ_TOK  shift 49
+	MOD_EQ_TOK  shift 50
+	PLUS_PLUS_TOK  shift 51
+	MINUS_MINUS_TOK  shift 52
+	RPAREN_TOK  reduce 45
+	SEMICOLON_TOK  reduce 45
+
+	arithmetic_op  goto 53
+	relational_op  goto 59
+
+
+state 66
+	assignment : id_token EQ_TOK expression .  (26)
+	expression : expression . arithmetic_op expression  (44)
+	expression : expression . relational_op expression  (45)
+	expression : expression . PLUS_PLUS_TOK  (46)
+	expression : expression . MINUS_MINUS_TOK  (47)
+
+	LT_TOK  shift 35
+	GT_TOK  shift 36
+	EQ_TOK  shift 37
+	MINUS_TOK  shift 38
+	PLUS_TOK  shift 39
+	MULT_TOK  shift 40
+	DIV_TOK  shift 41
+	MOD_TOK  shift 42
+	LT_EQ_TOK  shift 43
+	GT_EQ_TOK  shift 44
+	EQ_EQ_TOK  shift 45
+	PLUS_EQ_TOK  shift 46
+	MINUS_EQ_TOK  shift 47
+	MULT_EQ_TOK  shift 48
+	DIV_EQ_TOK  shift 49
+	MOD_EQ_TOK  shift 50
+	PLUS_PLUS_TOK  shift 51
+	MINUS_MINUS_TOK  shift 52
+	RPAREN_TOK  reduce 26
+	SEMICOLON_TOK  reduce 26
+
+	arithmetic_op  goto 53
+	relational_op  goto 59
+
+
+state 67
+	args : expression . COMMA_TOK args  (33)
+	args : expression .  (34)
+	expression : expression . arithmetic_op expression  (44)
+	expression : expression . relational_op expression  (45)
+	expression : expression . PLUS_PLUS_TOK  (46)
+	expression : expression . MINUS_MINUS_TOK  (47)
+
+	LT_TOK  shift 35
+	GT_TOK  shift 36
+	EQ_TOK  shift 37
+	MINUS_TOK  shift 38
+	PLUS_TOK  shift 39
+	MULT_TOK  shift 40
+	DIV_TOK  shift 41
+	MOD_TOK  shift 42
+	COMMA_TOK  shift 75
+	LT_EQ_TOK  shift 43
+	GT_EQ_TOK  shift 44
+	EQ_EQ_TOK  shift 45
+	PLUS_EQ_TOK  shift 46
+	MINUS_EQ_TOK  shift 47
+	MULT_EQ_TOK  shift 48
+	DIV_EQ_TOK  shift 49
+	MOD_EQ_TOK  shift 50
+	PLUS_PLUS_TOK  shift 51
+	MINUS_MINUS_TOK  shift 52
+	RPAREN_TOK  reduce 34
+
+	arithmetic_op  goto 53
+	relational_op  goto 59
+
+
+state 68
+	function_call : id_token LPAREN_TOK args . RPAREN_TOK  (32)
+
+	RPAREN_TOK  shift 76
+	.  error
+
+
+state 69
+	id_token : id_token COMMA_TOK ID_TOK .  (75)
+
+	.  reduce 75
+
+
+70: shift/reduce conflict (shift 35, reduce 45) on LT_TOK
+70: shift/reduce conflict (shift 36, reduce 45) on GT_TOK
+70: shift/reduce conflict (shift 37, reduce 45) on EQ_TOK
+70: shift/reduce conflict (shift 38, reduce 45) on MINUS_TOK
+70: shift/reduce conflict (shift 39, reduce 45) on PLUS_TOK
+70: shift/reduce conflict (shift 40, reduce 45) on MULT_TOK
+70: shift/reduce conflict (shift 41, reduce 45) on DIV_TOK
+70: shift/reduce conflict (shift 42, reduce 45) on MOD_TOK
+70: shift/reduce conflict (shift 43, reduce 45) on LT_EQ_TOK
+70: shift/reduce conflict (shift 44, reduce 45) on GT_EQ_TOK
+70: shift/reduce conflict (shift 45, reduce 45) on EQ_EQ_TOK
+70: shift/reduce conflict (shift 46, reduce 45) on PLUS_EQ_TOK
+70: shift/reduce conflict (shift 47, reduce 45) on MINUS_EQ_TOK
+70: shift/reduce conflict (shift 48, reduce 45) on MULT_EQ_TOK
+70: shift/reduce conflict (shift 49, reduce 45) on DIV_EQ_TOK
+70: shift/reduce conflict (shift 50, reduce 45) on MOD_EQ_TOK
+70: shift/reduce conflict (shift 51, reduce 45) on PLUS_PLUS_TOK
+70: shift/reduce conflict (shift 52, reduce 45) on MINUS_MINUS_TOK
+state 70
+	expression : expression . arithmetic_op expression  (44)
+	expression : expression . relational_op expression  (45)
+	expression : expression relational_op expression .  (45)
+	expression : expression . PLUS_PLUS_TOK  (46)
+	expression : expression . MINUS_MINUS_TOK  (47)
+
+	LT_TOK  shift 35
+	GT_TOK  shift 36
+	EQ_TOK  shift 37
+	MINUS_TOK  shift 38
+	PLUS_TOK  shift 39
+	MULT_TOK  shift 40
+	DIV_TOK  shift 41
+	MOD_TOK  shift 42
+	LT_EQ_TOK  shift 43
+	GT_EQ_TOK  shift 44
+	EQ_EQ_TOK  shift 45
+	PLUS_EQ_TOK  shift 46
+	MINUS_EQ_TOK  shift 47
+	MULT_EQ_TOK  shift 48
+	DIV_EQ_TOK  shift 49
+	MOD_EQ_TOK  shift 50
+	PLUS_PLUS_TOK  shift 51
+	MINUS_MINUS_TOK  shift 52
+	RPAREN_TOK  reduce 45
+	SEMICOLON_TOK  reduce 45
+	COMMA_TOK  reduce 45
+
+	arithmetic_op  goto 53
+	relational_op  goto 59
+
+
+state 71
+	main : datatype MAIN_TOK LPAREN_TOK RPAREN_TOK . block  (9)
+
+	LBRACE_TOK  shift 77
+	.  error
+
+	open_paren  goto 78
+	block  goto 79
+
+
+state 72
+	assignment : datatype id_token EQ_TOK expression .  (25)
+	expression : expression . arithmetic_op expression  (44)
+	expression : expression . relational_op expression  (45)
+	expression : expression . PLUS_PLUS_TOK  (46)
+	expression : expression . MINUS_MINUS_TOK  (47)
+
+	LT_TOK  shift 35
+	GT_TOK  shift 36
+	EQ_TOK  shift 37
+	MINUS_TOK  shift 38
+	PLUS_TOK  shift 39
+	MULT_TOK  shift 40
+	DIV_TOK  shift 41
+	MOD_TOK  shift 42
+	LT_EQ_TOK  shift 43
+	GT_EQ_TOK  shift 44
+	EQ_EQ_TOK  shift 45
+	PLUS_EQ_TOK  shift 46
+	MINUS_EQ_TOK  shift 47
+	MULT_EQ_TOK  shift 48
+	DIV_EQ_TOK  shift 49
+	MOD_EQ_TOK  shift 50
+	PLUS_PLUS_TOK  shift 51
+	MINUS_MINUS_TOK  shift 52
+	RPAREN_TOK  reduce 25
+	SEMICOLON_TOK  reduce 25
+
+	arithmetic_op  goto 53
+	relational_op  goto 59
+
+
+state 73
+	params : datatype . id_token COMMA_TOK params  (29)
+	params : datatype . id_token  (30)
+
+	ID_TOK  shift 8
+	.  error
+
+	id_token  goto 80
+
+
+state 74
+	function : datatype id_token LPAREN_TOK params . RPAREN_TOK block  (28)
+
+	RPAREN_TOK  shift 81
+	.  error
+
+
+state 75
+	args : expression COMMA_TOK . args  (33)
+	args : .  (35)
+
+	LPAREN_TOK  shift 1
+	SEMICOLON_TOK  shift 2
+	ID_TOK  shift 8
+	INTCONST  shift 9
+	FLOATCONST  shift 10
+	CHARCONST  shift 11
+	STRCONST  shift 12
+	RPAREN_TOK  reduce 35
+
+	expression  goto 67
+	id_token  goto 27
+	function_call  goto 25
+	args  goto 82
+
+
+state 76
+	function_call : id_token LPAREN_TOK args RPAREN_TOK .  (32)
+
+	.  reduce 32
+
+
+state 77
+	open_paren : LBRACE_TOK .  (7)
+
+	.  reduce 7
+
+
+state 78
+	block : open_paren . statements blocks close_paren  (10)
+	statements : .  (17)
+
+	.  reduce 17
+
+	statements  goto 83
+
+
+state 79
+	main : datatype MAIN_TOK LPAREN_TOK RPAREN_TOK block .  (9)
+
+	.  reduce 9
+
+
+state 80
+	params : datatype id_token . COMMA_TOK params  (29)
+	params : datatype id_token .  (30)
+	id_token : id_token . COMMA_TOK ID_TOK  (75)
+
+	COMMA_TOK  shift 84
+	RPAREN_TOK  reduce 30
+
+
+state 81
+	function : datatype id_token LPAREN_TOK params RPAREN_TOK . block  (28)
+
+	LBRACE_TOK  shift 77
+	.  error
+
+	open_paren  goto 78
+	block  goto 85
+
+
+state 82
+	args : expression COMMA_TOK args .  (33)
+
+	.  reduce 33
+
+
+state 83
+	block : open_paren statements . blocks close_paren  (10)
+	statements : statements . statement  (13)
+	statements : statements . if_statement  (14)
+	statements : statements . for_statement  (15)
+	statements : statements . while_statement  (16)
+	blocks : .  (12)
+
+	LBRACE_TOK  shift 77
+	LPAREN_TOK  shift 1
+	SEMICOLON_TOK  shift 2
+	WHILE_TOK  shift 86
+	FOR_TOK  shift 87
+	IF_TOK  shift 88
+	VOID_TOK  shift 3
+	INT_TOK  shift 4
+	FLOAT_TOK  shift 5
+	CHAR_TOK  shift 6
+	RETURN_TOK  shift 7
+	ID_TOK  shift 8
+	INTCONST  shift 9
+	FLOATCONST  shift 10
+	CHARCONST  shift 11
+	STRCONST  shift 12
+	RBRACE_TOK  reduce 12
+
+	statement  goto 89
+	open_paren  goto 78
+	datatype  goto 90
+	block  goto 91
+	blocks  goto 92
+	if_statement  goto 93
+	for_statement  goto 94
+	while_statement  goto 95
+	operation  goto 18
+	return_statement  goto 19
+	declaration  goto 20
+	assignment  goto 21
+	expression  goto 22
+	condition  goto 23
+	id_token  goto 24
+	function_call  goto 25
+
+
+state 84
+	params : datatype id_token COMMA_TOK . params  (29)
+	id_token : id_token COMMA_TOK . ID_TOK  (75)
+	params : .  (31)
+
+	VOID_TOK  shift 3
+	INT_TOK  shift 4
+	FLOAT_TOK  shift 5
+	CHAR_TOK  shift 6
+	ID_TOK  shift 69
+	RPAREN_TOK  reduce 31
+
+	datatype  goto 73
+	params  goto 96
+
+
+state 85
+	function : datatype id_token LPAREN_TOK params RPAREN_TOK block .  (28)
+
+	.  reduce 28
+
+
+state 86
+	while_statement : WHILE_TOK . LPAREN_TOK condition RPAREN_TOK block  (52)
+
+	LPAREN_TOK  shift 97
+	.  error
+
+
+state 87
+	for_statement : FOR_TOK . LPAREN_TOK operation SEMICOLON_TOK operation SEMICOLON_TOK operation RPAREN_TOK block  (51)
+
+	LPAREN_TOK  shift 98
+	.  error
+
+
+state 88
+	if_statement : IF_TOK . LPAREN_TOK condition RPAREN_TOK block  (48)
+	if_statement : IF_TOK . LPAREN_TOK condition RPAREN_TOK block ELSE_TOK block  (49)
+	if_statement : IF_TOK . LPAREN_TOK condition RPAREN_TOK block ELSE_TOK if_statement  (50)
+
+	LPAREN_TOK  shift 99
+	.  error
+
+
+state 89
+	statements : statements statement .  (13)
+
+	.  reduce 13
+
+
+state 90
+	declaration : datatype . id_token  (24)
+	assignment : datatype . id_token EQ_TOK expression  (25)
+
+	ID_TOK  shift 8
+	.  error
+
+	id_token  goto 100
+
+
+state 91
+	blocks : block . statements blocks  (11)
+	statements : .  (17)
+
+	.  reduce 17
+
+	statements  goto 101
+
+
+state 92
+	block : open_paren statements blocks . close_paren  (10)
+
+	RBRACE_TOK  shift 102
+	.  error
+
+	close_paren  goto 103
+
+
+state 93
+	statements : statements if_statement .  (14)
+
+	.  reduce 14
+
+
+state 94
+	statements : statements for_statement .  (15)
+
+	.  reduce 15
+
+
+state 95
+	statements : statements while_statement .  (16)
+
+	.  reduce 16
+
+
+state 96
+	params : datatype id_token COMMA_TOK params .  (29)
+
+	.  reduce 29
+
+
+state 97
+	while_statement : WHILE_TOK LPAREN_TOK . condition RPAREN_TOK block  (52)
+
+	LPAREN_TOK  shift 1
+	SEMICOLON_TOK  shift 2
+	ID_TOK  shift 8
+	INTCONST  shift 9
+	FLOATCONST  shift 10
+	CHARCONST  shift 11
+	STRCONST  shift 12
+	.  error
+
+	expression  goto 104
+	condition  goto 105
+	id_token  goto 27
+	function_call  goto 25
+
+
+state 98
+	for_statement : FOR_TOK LPAREN_TOK . operation SEMICOLON_TOK operation SEMICOLON_TOK operation RPAREN_TOK block  (51)
+
+	LPAREN_TOK  shift 1
+	SEMICOLON_TOK  shift 2
+	VOID_TOK  shift 3
+	INT_TOK  shift 4
+	FLOAT_TOK  shift 5
+	CHAR_TOK  shift 6
+	ID_TOK  shift 8
+	INTCONST  shift 9
+	FLOATCONST  shift 10
+	CHARCONST  shift 11
+	STRCONST  shift 12
+	.  error
+
+	datatype  goto 90
+	operation  goto 106
+	declaration  goto 20
+	assignment  goto 21
+	expression  goto 22
+	condition  goto 23
+	id_token  goto 24
+	function_call  goto 25
+
+
+state 99
+	if_statement : IF_TOK LPAREN_TOK . condition RPAREN_TOK block  (48)
+	if_statement : IF_TOK LPAREN_TOK . condition RPAREN_TOK block ELSE_TOK block  (49)
+	if_statement : IF_TOK LPAREN_TOK . condition RPAREN_TOK block ELSE_TOK if_statement  (50)
+
+	LPAREN_TOK  shift 1
+	SEMICOLON_TOK  shift 2
+	ID_TOK  shift 8
+	INTCONST  shift 9
+	FLOATCONST  shift 10
+	CHARCONST  shift 11
+	STRCONST  shift 12
+	.  error
+
+	expression  goto 104
+	condition  goto 107
+	id_token  goto 27
+	function_call  goto 25
+
+
+state 100
+	declaration : datatype id_token .  (24)
+	assignment : datatype id_token . EQ_TOK expression  (25)
+	id_token : id_token . COMMA_TOK ID_TOK  (75)
+
+	EQ_TOK  shift 62
+	COMMA_TOK  shift 57
+	RPAREN_TOK  reduce 24
+	SEMICOLON_TOK  reduce 24
+
+
+state 101
+	blocks : block statements . blocks  (11)
+	statements : statements . statement  (13)
+	statements : statements . if_statement  (14)
+	statements : statements . for_statement  (15)
+	statements : statements . while_statement  (16)
+	blocks : .  (12)
+
+	LBRACE_TOK  shift 77
+	LPAREN_TOK  shift 1
+	SEMICOLON_TOK  shift 2
+	WHILE_TOK  shift 86
+	FOR_TOK  shift 87
+	IF_TOK  shift 88
+	VOID_TOK  shift 3
+	INT_TOK  shift 4
+	FLOAT_TOK  shift 5
+	CHAR_TOK  shift 6
+	RETURN_TOK  shift 7
+	ID_TOK  shift 8
+	INTCONST  shift 9
+	FLOATCONST  shift 10
+	CHARCONST  shift 11
+	STRCONST  shift 12
+	RBRACE_TOK  reduce 12
+
+	statement  goto 89
+	open_paren  goto 78
+	datatype  goto 90
+	block  goto 91
+	blocks  goto 108
+	if_statement  goto 93
+	for_statement  goto 94
+	while_statement  goto 95
+	operation  goto 18
+	return_statement  goto 19
+	declaration  goto 20
+	assignment  goto 21
+	expression  goto 22
+	condition  goto 23
+	id_token  goto 24
+	function_call  goto 25
+
+
+state 102
+	close_paren : RBRACE_TOK .  (8)
+
+	.  reduce 8
+
+
+state 103
+	block : open_paren statements blocks close_paren .  (10)
+
+	.  reduce 10
+
+
+state 104
+	expression : expression . arithmetic_op expression  (44)
+	expression : expression . relational_op expression  (45)
+	expression : expression . PLUS_PLUS_TOK  (46)
+	expression : expression . MINUS_MINUS_TOK  (47)
+	condition : expression . relational_op expression  (53)
+	condition : expression .  (54)
+
+	LT_TOK  shift 35
+	GT_TOK  shift 36
+	EQ_TOK  shift 37
+	MINUS_TOK  shift 38
+	PLUS_TOK  shift 39
+	MULT_TOK  shift 40
+	DIV_TOK  shift 41
+	MOD_TOK  shift 42
+	LT_EQ_TOK  shift 43
+	GT_EQ_TOK  shift 44
+	EQ_EQ_TOK  shift 45
+	PLUS_EQ_TOK  shift 46
+	MINUS_EQ_TOK  shift 47
+	MULT_EQ_TOK  shift 48
+	DIV_EQ_TOK  shift 49
+	MOD_EQ_TOK  shift 50
+	PLUS_PLUS_TOK  shift 51
+	MINUS_MINUS_TOK  shift 52
+	RPAREN_TOK  reduce 54
+
+	arithmetic_op  goto 53
+	relational_op  goto 54
+
+
+state 105
+	while_statement : WHILE_TOK LPAREN_TOK condition . RPAREN_TOK block  (52)
+
+	RPAREN_TOK  shift 109
+	.  error
+
+
+state 106
+	for_statement : FOR_TOK LPAREN_TOK operation . SEMICOLON_TOK operation SEMICOLON_TOK operation RPAREN_TOK block  (51)
+
+	SEMICOLON_TOK  shift 110
+	.  error
+
+
+state 107
+	if_statement : IF_TOK LPAREN_TOK condition . RPAREN_TOK block  (48)
+	if_statement : IF_TOK LPAREN_TOK condition . RPAREN_TOK block ELSE_TOK block  (49)
+	if_statement : IF_TOK LPAREN_TOK condition . RPAREN_TOK block ELSE_TOK if_statement  (50)
+
+	RPAREN_TOK  shift 111
+	.  error
+
+
+state 108
+	blocks : block statements blocks .  (11)
+
+	.  reduce 11
+
+
+state 109
+	while_statement : WHILE_TOK LPAREN_TOK condition RPAREN_TOK . block  (52)
+
+	LBRACE_TOK  shift 77
+	.  error
+
+	open_paren  goto 78
+	block  goto 112
+
+
+state 110
+	for_statement : FOR_TOK LPAREN_TOK operation SEMICOLON_TOK . operation SEMICOLON_TOK operation RPAREN_TOK block  (51)
+
+	LPAREN_TOK  shift 1
+	SEMICOLON_TOK  shift 2
+	VOID_TOK  shift 3
+	INT_TOK  shift 4
+	FLOAT_TOK  shift 5
+	CHAR_TOK  shift 6
+	ID_TOK  shift 8
+	INTCONST  shift 9
+	FLOATCONST  shift 10
+	CHARCONST  shift 11
+	STRCONST  shift 12
+	.  error
+
+	datatype  goto 90
+	operation  goto 113
+	declaration  goto 20
+	assignment  goto 21
+	expression  goto 22
+	condition  goto 23
+	id_token  goto 24
+	function_call  goto 25
+
+
+state 111
+	if_statement : IF_TOK LPAREN_TOK condition RPAREN_TOK . block  (48)
+	if_statement : IF_TOK LPAREN_TOK condition RPAREN_TOK . block ELSE_TOK block  (49)
+	if_statement : IF_TOK LPAREN_TOK condition RPAREN_TOK . block ELSE_TOK if_statement  (50)
+
+	LBRACE_TOK  shift 77
+	.  error
+
+	open_paren  goto 78
+	block  goto 114
+
+
+state 112
+	while_statement : WHILE_TOK LPAREN_TOK condition RPAREN_TOK block .  (52)
+
+	.  reduce 52
+
+
+state 113
+	for_statement : FOR_TOK LPAREN_TOK operation SEMICOLON_TOK operation . SEMICOLON_TOK operation RPAREN_TOK block  (51)
+
+	SEMICOLON_TOK  shift 115
+	.  error
+
+
+state 114
+	if_statement : IF_TOK LPAREN_TOK condition RPAREN_TOK block .  (48)
+	if_statement : IF_TOK LPAREN_TOK condition RPAREN_TOK block . ELSE_TOK block  (49)
+	if_statement : IF_TOK LPAREN_TOK condition RPAREN_TOK block . ELSE_TOK if_statement  (50)
+
+	ELSE_TOK  shift 116
+	LBRACE_TOK  reduce 48
+	RBRACE_TOK  reduce 48
+	LPAREN_TOK  reduce 48
+	SEMICOLON_TOK  reduce 48
+	WHILE_TOK  reduce 48
+	FOR_TOK  reduce 48
+	IF_TOK  reduce 48
+	VOID_TOK  reduce 48
+	INT_TOK  reduce 48
+	FLOAT_TOK  reduce 48
+	CHAR_TOK  reduce 48
+	RETURN_TOK  reduce 48
+	ID_TOK  reduce 48
+	INTCONST  reduce 48
+	FLOATCONST  reduce 48
+	CHARCONST  reduce 48
+	STRCONST  reduce 48
+
+
+state 115
+	for_statement : FOR_TOK LPAREN_TOK operation SEMICOLON_TOK operation SEMICOLON_TOK . operation RPAREN_TOK block  (51)
+
+	LPAREN_TOK  shift 1
+	SEMICOLON_TOK  shift 2
+	VOID_TOK  shift 3
+	INT_TOK  shift 4
+	FLOAT_TOK  shift 5
+	CHAR_TOK  shift 6
+	ID_TOK  shift 8
+	INTCONST  shift 9
+	FLOATCONST  shift 10
+	CHARCONST  shift 11
+	STRCONST  shift 12
+	.  error
+
+	datatype  goto 90
+	operation  goto 117
+	declaration  goto 20
+	assignment  goto 21
+	expression  goto 22
+	condition  goto 23
+	id_token  goto 24
+	function_call  goto 25
+
+
+state 116
+	if_statement : IF_TOK LPAREN_TOK condition RPAREN_TOK block ELSE_TOK . block  (49)
+	if_statement : IF_TOK LPAREN_TOK condition RPAREN_TOK block ELSE_TOK . if_statement  (50)
+
+	LBRACE_TOK  shift 77
+	IF_TOK  shift 88
+	.  error
+
+	open_paren  goto 78
+	block  goto 118
+	if_statement  goto 119
+
+
+state 117
+	for_statement : FOR_TOK LPAREN_TOK operation SEMICOLON_TOK operation SEMICOLON_TOK operation . RPAREN_TOK block  (51)
+
+	RPAREN_TOK  shift 120
+	.  error
+
+
+state 118
+	if_statement : IF_TOK LPAREN_TOK condition RPAREN_TOK block ELSE_TOK block .  (49)
+
+	.  reduce 49
+
+
+state 119
+	if_statement : IF_TOK LPAREN_TOK condition RPAREN_TOK block ELSE_TOK if_statement .  (50)
+
+	.  reduce 50
+
+
+state 120
+	for_statement : FOR_TOK LPAREN_TOK operation SEMICOLON_TOK operation SEMICOLON_TOK operation RPAREN_TOK . block  (51)
+
+	LBRACE_TOK  shift 77
+	.  error
+
+	open_paren  goto 78
+	block  goto 121
+
+
+state 121
+	for_statement : FOR_TOK LPAREN_TOK operation SEMICOLON_TOK operation SEMICOLON_TOK operation RPAREN_TOK block .  (51)
+
+	.  reduce 51
+
+
+Rules never reduced:
+	condition : expression relational_op expression  (53)
+
+
+State 22 contains 2 reduce/reduce conflicts.
+State 24 contains 1 shift/reduce conflict.
+State 27 contains 1 shift/reduce conflict.
+State 64 contains 18 shift/reduce conflicts.
+State 65 contains 18 shift/reduce conflicts, 2 reduce/reduce conflicts.
+State 70 contains 18 shift/reduce conflicts.
+
+
+57 terminals, 26 nonterminals
+77 grammar rules, 122 states
