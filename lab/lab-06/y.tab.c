@@ -199,6 +199,7 @@ void parsed(const char * msg) {
 
 int scope = 0;
 int dtype = 0;
+int type = -1;
 symbol_table *table;
 
 void add_variable(symbol_table *t, char *name, int dtype) {
@@ -216,6 +217,14 @@ bool is_declared(symbol_table *t, char *name) {
 
 void delete_variables(symbol_table *t) {
     remove_table(t, scope);
+}
+
+int get_type(symbol_table *t, char *name, int scope) {
+    symbol *var = lookup_table(t, name, scope);
+    if (var == NULL) {
+        return -1;
+    }
+    return var->dtype;
 }
 
 
@@ -251,7 +260,7 @@ typedef int YYSTYPE;
 
 
 /* Line 216 of yacc.c.  */
-#line 255 "y.tab.c"
+#line 264 "y.tab.c"
 
 #ifdef short
 # undef short
@@ -567,14 +576,14 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   122,   122,   123,   124,   125,   126,   127,   130,   133,
-     137,   141,   144,   145,   148,   149,   150,   151,   152,   155,
-     156,   159,   160,   161,   162,   165,   172,   177,   186,   189,
-     192,   193,   194,   197,   200,   201,   202,   205,   206,   212,
-     213,   214,   215,   216,   217,   218,   219,   220,   221,   224,
-     225,   226,   229,   232,   235,   236,   239,   240,   241,   242,
-     243,   244,   245,   246,   247,   248,   251,   252,   253,   254,
-     255,   256,   259,   260,   261,   262,   265,   266
+       0,   130,   130,   131,   132,   133,   134,   135,   138,   141,
+     145,   149,   152,   153,   156,   157,   158,   159,   160,   163,
+     164,   167,   168,   169,   170,   173,   180,   192,   209,   212,
+     215,   216,   217,   220,   223,   224,   225,   228,   229,   245,
+     253,   261,   269,   277,   278,   279,   280,   281,   282,   285,
+     286,   287,   290,   293,   296,   297,   300,   301,   302,   303,
+     304,   305,   306,   307,   308,   309,   312,   313,   314,   315,
+     316,   317,   320,   321,   322,   323,   326,   327
 };
 #endif
 
@@ -1605,22 +1614,27 @@ yyreduce:
   switch (yyn)
     {
         case 8:
-#line 130 "parser.y"
+#line 138 "parser.y"
     { scope++; }
     break;
 
   case 9:
-#line 133 "parser.y"
+#line 141 "parser.y"
     { delete_variables(table); scope--; }
     break;
 
   case 10:
-#line 137 "parser.y"
+#line 145 "parser.y"
     {parsed("main function");}
     break;
 
+  case 19:
+#line 163 "parser.y"
+    {type = -1;}
+    break;
+
   case 25:
-#line 165 "parser.y"
+#line 173 "parser.y"
     {
     parsed("declaration statement");
     add_variable(table, var_name, dtype);
@@ -1629,8 +1643,15 @@ yyreduce:
     break;
 
   case 26:
-#line 172 "parser.y"
+#line 180 "parser.y"
     {
+    if (type == -1) {
+        type = dtype;
+    } else if (type != dtype) {
+        yyerror("type mismatch");
+        return 1;
+    }
+
     add_variable(table, var_name, dtype);
     iterate_table(table);
     parsed("assignment statement");
@@ -1638,8 +1659,16 @@ yyreduce:
     break;
 
   case 27:
-#line 177 "parser.y"
+#line 192 "parser.y"
     {
+    int current_type = get_type(table, var_name, scope);
+    if (type == -1) {
+        type = current_type;
+    } else if (type != current_type) {
+        yyerror("type mismatch");
+        return 1;
+    }
+
     if(!is_declared(table, var_name)) {
         yyerror("variable not declared");
         return 1;
@@ -1649,78 +1678,149 @@ yyreduce:
     break;
 
   case 28:
-#line 186 "parser.y"
+#line 209 "parser.y"
     {parsed("return statement");}
     break;
 
   case 29:
-#line 189 "parser.y"
+#line 212 "parser.y"
     {parsed("function");}
     break;
 
   case 33:
-#line 197 "parser.y"
+#line 220 "parser.y"
     {parsed("function call");}
     break;
 
   case 38:
-#line 206 "parser.y"
+#line 229 "parser.y"
     {
-    if(!is_declared(table, var_name)) {
-        yyerror("variable not declared");
-        return 1;
-    }
+                    if(!is_declared(table, var_name)) {
+                        yyerror("variable not declared");
+                        return 1;
+                    }
+
+                    if(type == -1) {
+                        type = get_type(table, var_name, scope);
+                    } else {
+                        int current_type = get_type(table, var_name, scope);
+                        if (current_type != type) {
+                            yyerror("type mismatch");
+                            return 1;
+                        }
+                    }
+                }
+    break;
+
+  case 39:
+#line 245 "parser.y"
+    {
+                    if(type == -1) {
+                        type = INT_TOK;
+                    } else if (type != INT_TOK) {
+                        yyerror("type mismatch");
+                        return 1;
+                    }
+                }
+    break;
+
+  case 40:
+#line 253 "parser.y"
+    {
+                    if(type == -1) {
+                        type = FLOAT_TOK;
+                    } else if (type != FLOAT_TOK) {
+                        yyerror("type mismatch");
+                        return 1;
+                    }
+                }
+    break;
+
+  case 41:
+#line 261 "parser.y"
+    {
+                    if(type == -1) {
+                        type = CHAR_TOK;
+                    } else if (type != CHAR_TOK) {
+                        yyerror("type mismatch");
+                        return 1;
+                    }
+                }
+    break;
+
+  case 42:
+#line 269 "parser.y"
+    {
+                    if(type == -1) {
+                        type = CHAR_TOK;
+                    } else if (type != CHAR_TOK) {
+                        yyerror("type mismatch");
+                        return 1;
+                    }
                 }
     break;
 
   case 49:
-#line 224 "parser.y"
+#line 285 "parser.y"
     {parsed("if statement");}
     break;
 
   case 50:
-#line 225 "parser.y"
+#line 286 "parser.y"
     {parsed("if-else statement");}
     break;
 
   case 51:
-#line 226 "parser.y"
+#line 287 "parser.y"
     {parsed("else-if statement");}
     break;
 
   case 52:
-#line 229 "parser.y"
+#line 290 "parser.y"
     {parsed("for statement");}
     break;
 
   case 53:
-#line 232 "parser.y"
+#line 293 "parser.y"
     {parsed("while statement");}
     break;
 
   case 72:
-#line 259 "parser.y"
-    { dtype = INT_TOK; }
+#line 320 "parser.y"
+    { dtype = INT_TOK;}
     break;
 
   case 73:
-#line 260 "parser.y"
-    { dtype = VOID_TOK; }
+#line 321 "parser.y"
+    { dtype = VOID_TOK;}
     break;
 
   case 74:
-#line 261 "parser.y"
-    { dtype = CHAR_TOK; }
+#line 322 "parser.y"
+    { dtype = CHAR_TOK;}
     break;
 
   case 75:
-#line 262 "parser.y"
-    { dtype = FLOAT_TOK; }
+#line 323 "parser.y"
+    { dtype = FLOAT_TOK;}
+    break;
+
+  case 77:
+#line 327 "parser.y"
+    { 
+                    int current_type = get_type(table, var_name, scope);
+                    if (type == -1) {
+                        type = current_type;
+                    } else if (type != current_type) {
+                        yyerror("type mismatch");
+                        return 1;
+                    }
+}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1724 "y.tab.c"
+#line 1824 "y.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1934,7 +2034,7 @@ yyreturn:
 }
 
 
-#line 269 "parser.y"
+#line 338 "parser.y"
 
 
 void yyerror(char *s) {
